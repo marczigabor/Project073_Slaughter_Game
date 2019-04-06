@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Game } from '../shared/model/game';
+import { Canvas } from '../shared/model/canvas';
 
 @Component({
   selector: 'app-main',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MainComponent implements OnInit {
 
+  private game: Game;
+
   constructor() { }
 
   ngOnInit() {
+    this.game = new Game(50,50, 'DarkOrange', 'container');
+    this.game.init();
   }
 
 }
