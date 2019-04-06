@@ -1,25 +1,28 @@
 import { Canvas } from './canvas';
 import { fromEvent } from 'rxjs'
 import { tap } from 'rxjs/operators'
-import { Area } from './area';
 import { Point } from './point';
+import { Map } from './map';
 
 export class Game {
 
     private _canvas: Canvas;
     private _containerNode: HTMLElement;
-    private _gameBlock: Area;
+    private _map: Map;
 
     constructor(
         widthBlockNumber: number, 
         heightBlockNumber: number,
-        backgroundColor: string,  
-        contaierId: string) {
+        containerId: string,
+        backgroundColor?: string
+        ) {
 
-            this._gameBlock = new Area(widthBlockNumber, heightBlockNumber);
+            this._map = new Map(widthBlockNumber, heightBlockNumber);
 
-            this._containerNode = document.getElementById(contaierId);
+            this._containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(this._containerNode.offsetWidth, this._containerNode.offsetHeight, backgroundColor);
+
+            console.log( this._map.grid);
     }
 
     init(): void {
@@ -34,7 +37,7 @@ export class Game {
     }
 
     private getBlockByCoordinate(x: number, y: number): Point {
-        return new Point(Math.floor( x / (this._canvas.width / this._gameBlock.width)), Math.floor (y / (this._canvas.height / this._gameBlock.height)));
+        return new Point(Math.floor( x / (this._canvas.width / this._map.width)), Math.floor (y / (this._canvas.height / this._map.height)));
     }
 
     get canvas(): Canvas {
