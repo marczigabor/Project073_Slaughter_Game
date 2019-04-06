@@ -15,7 +15,7 @@ export class MainComponent implements OnInit {
 
   ngOnInit() {
     this.game = new Game(50,50, 'container', 'DarkOrange');
-    this.game.init();
+    this.game.display(true);
   }
 
 }

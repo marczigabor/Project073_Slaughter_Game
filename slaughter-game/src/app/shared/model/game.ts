@@ -25,9 +25,14 @@ export class Game {
             console.log( this._map.grid);
     }
 
-    init(): void {
+
+    display(displayGrid?: boolean): void {
         
         this._containerNode.appendChild(this._canvas.createCanvasNode());
+
+        if (displayGrid){
+                this._canvas.displayGrid(this._map.width, this._map.height);
+        }
 
         fromEvent(this._canvas.canvasNode, 'click')
             .pipe(tap((event: MouseEvent) => {

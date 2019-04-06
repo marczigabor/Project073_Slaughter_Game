@@ -19,6 +19,25 @@ export class Canvas {
         return this._canvasNode;
     }
 
+
+    displayGrid(xBlocks: number, yBlocks: number){
+        var ctx = this.canvasNode.getContext("2d");
+
+        for (let i=0; i<xBlocks; i++ ) {
+            ctx.beginPath();
+            ctx.moveTo(i * (this._canvasNode.width / xBlocks) , 0);
+            ctx.lineTo(i * (this._canvasNode.width / xBlocks), this._canvasNode.height);
+            ctx.stroke();
+        }
+        for (let i=0; i<yBlocks; i++ ) {
+            ctx.beginPath();
+            ctx.moveTo(0,  i * (this._canvasNode.height / yBlocks));
+            ctx.lineTo(this._canvasNode.width, i * (this._canvasNode.height / yBlocks));
+            ctx.stroke();
+        }
+
+    }
+
     get width(): number {
         return this._width;
     }
