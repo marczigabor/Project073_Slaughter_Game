@@ -11,24 +11,24 @@ export class Map {
 
     getRoute = (startPoint: Point, endPoint: Point):any => {
         this.clearDirtyNodes();
-        var start = this._grid.grid[startPoint.y][startPoint.x];
-        var end = this._grid.grid[endPoint.y][endPoint.x];
+        var start = this._grid.grid[startPoint.x][startPoint.y];
+        var end = this._grid.grid[endPoint.x][endPoint.y];
         return astar.search(this._grid, start, end);            
     }
 
     generateArray = (x: number, y: number, generateWalls: boolean): number[][] => {
         let array: number[][] = [];
         let j=0;
-        for (let i=0; i < y; i++){
-            array[i] = Array.from(Array(x), () => j++ /*generateWalls ? this.getRandomInt(0, 1) : 1*/);
+        for (let i=0; i < x; i++){
+            array[i] = Array.from(Array(y), () => generateWalls ? this.getRandomInt(0, 1) : 1);
         }
 
-        console.log(array);
+        //console.log(array);
         return array;
     }
 
     getValueOfBlock = (x: number, y: number): number => { //0: wall; 1: opened
-        return this._grid.grid[y][x].weight;
+        return this._grid.grid[x][y].weight;
     }
 
     private clearDirtyNodes = () => {
