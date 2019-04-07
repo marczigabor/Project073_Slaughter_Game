@@ -39,10 +39,30 @@ export class GameAnimation {
         this._context.fill();
     };
     
+    displayGrid(xBlocks: number, yBlocks: number){
+
+        for (let i = 0; i < xBlocks; i++ ) {
+            this._context.beginPath();
+            this._context.moveTo(i * (this._canvas.width / xBlocks) , 0);
+            this._context.lineTo(i * (this._canvas.width / xBlocks), this._canvas.height);
+            this._context.stroke();
+        }
+        for (let i=0; i<yBlocks; i++ ) {
+            this._context.beginPath();
+            this._context.moveTo(0,  i * (this._canvas.height / yBlocks));
+            this._context.lineTo(this._canvas.width, i * (this._canvas.height / yBlocks));
+            this._context.stroke();
+        }
+
+    }
+
     private draw = ():void => {
         this._context.clearRect(0,0, this._canvas.offsetWidth, this._canvas.height);
+        
+        this.displayGrid(4, 4);        
         this.ballDraw();
         
+
         switch (this._moveDirection){
             case Direction.Down:
                 this.ball.y += this.ball.vy;
@@ -58,9 +78,21 @@ export class GameAnimation {
                 break;
         }
        
-        if(Math.abs(this.ball.x - this._moveTo.x) > 10 || Math.abs(this.ball.y - this._moveTo.y) > 10 ){
-            this._raf = this._requestAnimationFrame(this.draw);
+        switch (this._moveDirection){
+            case Direction.Down:
+            case Direction.Up:
+                if (Math.abs(this.ball.y - this._moveTo.y) > 10){
+                    this._raf = this._requestAnimationFrame(this.draw);
+                }
+                break;
+            case Direction.Left:
+            case Direction.Right:
+                if (Math.abs(this.ball.x - this._moveTo.x) > 10){
+                    this._raf = this._requestAnimationFrame(this.draw);
+                }
+                break;
         }
+
 
         // if (this.ball.y + this.ball.vy > this._canvas.height ||
         //     this.ball.y + this.ball.vy < 0) {
@@ -74,6 +106,7 @@ export class GameAnimation {
     }
     
     move = (fromPoint: Point, toPoint: Point) => {
+        this._cancelAnimationFrame(this._raf);
 
         this._moveFrom = fromPoint;
         this._moveTo = toPoint;

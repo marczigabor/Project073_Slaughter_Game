@@ -32,6 +32,9 @@ export class Game {
 
     display(displayGrid?: boolean): void {
 
+        let x = 0;
+        let y = 0;
+
         if (displayGrid){
                 this._canvas.displayGrid(this._map.width, this._map.height);
         }
@@ -46,7 +49,11 @@ export class Game {
                 let routes = this._map.getRoute(point, new Point(3,3));
                 console.log(routes);
 
-                this._animation.move(new Point(0,0), this.getCoordinateByBlock(point.x, point.y));
+                let pointTo = this.getCoordinateByBlock(point.x, point.y);
+                this._animation.move(new Point(x, y), pointTo);
+
+                x = pointTo.x;
+                y = pointTo.y;
 
             }))
             .subscribe();
