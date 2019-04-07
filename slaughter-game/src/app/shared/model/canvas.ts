@@ -2,7 +2,9 @@ export class Canvas {
     private _width: number;
     private _height: number;
     private _backgroundColor: string;
-    private _canvasNode: HTMLCanvasElement;
+    private _canvas: HTMLCanvasElement;
+    private _context:any; 
+
 
     constructor(width: number, height: number, backgroundColor: string) {
         this._height = height;
@@ -11,29 +13,30 @@ export class Canvas {
     }
 
     createCanvasNode(): HTMLCanvasElement{
-        this._canvasNode = document.createElement("canvas");
-        this._canvasNode.width = this._width;
-        this._canvasNode.height = this._height;
-        this._canvasNode.style.backgroundColor = this._backgroundColor;
+        this._canvas = document.createElement("canvas");
+        this._context = this.canvas.getContext("2d");
 
-        return this._canvasNode;
+        this._canvas.width = this._width;
+        this._canvas.height = this._height;
+        this._canvas.style.backgroundColor = this._backgroundColor;
+
+        return this._canvas;
     }
 
 
     displayGrid(xBlocks: number, yBlocks: number){
-        var ctx = this.canvasNode.getContext("2d");
 
-        for (let i=0; i<xBlocks; i++ ) {
-            ctx.beginPath();
-            ctx.moveTo(i * (this._canvasNode.width / xBlocks) , 0);
-            ctx.lineTo(i * (this._canvasNode.width / xBlocks), this._canvasNode.height);
-            ctx.stroke();
+        for (let i = 0; i < xBlocks; i++ ) {
+            this._context.beginPath();
+            this._context.moveTo(i * (this._canvas.width / xBlocks) , 0);
+            this._context.lineTo(i * (this._canvas.width / xBlocks), this._canvas.height);
+            this._context.stroke();
         }
         for (let i=0; i<yBlocks; i++ ) {
-            ctx.beginPath();
-            ctx.moveTo(0,  i * (this._canvasNode.height / yBlocks));
-            ctx.lineTo(this._canvasNode.width, i * (this._canvasNode.height / yBlocks));
-            ctx.stroke();
+            this._context.beginPath();
+            this._context.moveTo(0,  i * (this._canvas.height / yBlocks));
+            this._context.lineTo(this._canvas.width, i * (this._canvas.height / yBlocks));
+            this._context.stroke();
         }
 
     }
@@ -49,7 +52,13 @@ export class Canvas {
     get backgroundColor(): string {
         return this._backgroundColor;
     }
-    get canvasNode(): HTMLCanvasElement {
-        return this._canvasNode;
+
+    get canvas(): HTMLCanvasElement {
+        return this._canvas;
     }
+
+    get context(): any {
+        return this._context;
+    }
+    
 }
