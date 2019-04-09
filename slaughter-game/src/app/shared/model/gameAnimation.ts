@@ -14,8 +14,11 @@ export class GameAnimation {
     private _context:any; 
 
     private _moveTo: Point;
-    private _moveFrom: Point;
+    //private _moveFrom: Point;
     private _moveDirection: Direction;
+    private inMove: boolean;
+    private movePoints: Point[];
+    private  index: number = 0;
 
     constructor (context: any, canvas: HTMLCanvasElement){
         this._canvas = canvas;
@@ -23,17 +26,17 @@ export class GameAnimation {
     }
 
     private ball = {
-        x: 100,
-        y: 100,
+        x: 0,
+        y: 0,
         vx: 5,
         vy: 5,
-        radius: 25,
+        radius: 50,
         color: 'blue',
     };
 
     private ballDraw = ()=> {
         this._context.beginPath();
-        this._context.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2, true);
+        this._context.arc(this.ball.x + this.ball.radius+50, this.ball.y + this.ball.radius+40, this.ball.radius, 0, Math.PI * 2, true);
         this._context.closePath();
         this._context.fillStyle = this.ball.color;
         this._context.fill();
@@ -57,6 +60,7 @@ export class GameAnimation {
     }
 
     private draw = ():void => {
+        this.inMove = true;
         this._context.clearRect(0,0, this._canvas.offsetWidth, this._canvas.height);
         
         this.displayGrid(4, 4);        
@@ -81,58 +85,71 @@ export class GameAnimation {
         switch (this._moveDirection){
             case Direction.Down:
             case Direction.Up:
-                if (Math.abs(this.ball.y - this._moveTo.y) > 10){
+                if (Math.abs(this.ball.y - this._moveTo.y) >5){
                     this._raf = this._requestAnimationFrame(this.draw);
+                }else {
+                    this.inMove = false;
+                    this.ball.x = this._moveTo.x;
+                    this.ball.y = this._moveTo.y;
+                    this.index++;
+                    this.step();
                 }
                 break;
             case Direction.Left:
             case Direction.Right:
-                if (Math.abs(this.ball.x - this._moveTo.x) > 10){
+                if (Math.abs(this.ball.x - this._moveTo.x) > 5){
                     this._raf = this._requestAnimationFrame(this.draw);
+                }else {
+                    this.inMove = false;
+                    this.ball.x = this._moveTo.x;
+                    this.ball.y = this._moveTo.y;
+                    this.index++;
+                    this.step();
                 }
                 break;
         }
 
+    }
 
-        // if (this.ball.y + this.ball.vy > this._canvas.height ||
-        //     this.ball.y + this.ball.vy < 0) {
-        //         this.ball.vy = -this.ball.vy;
-        // }
-        // if (this.ball.x + this.ball.vx > this._canvas.width ||
-        //     this.ball.x + this.ball.vx < 0) {
-        //         this.ball.vx = -this.ball.vx;
-        // }
-        
+    getBallPoints(): Point{
+        return new Point(this.ball.x, this.ball.y);
     }
     
-    move = (fromPoint: Point, toPoint: Point) => {
+    move = (movePoints: Point[]): void => {
+
+        if (this.inMove || movePoints.length == 0 ) {
+            return;
+        }
+        this.movePoints = movePoints;
+        this.index = 0;
+        this.step();
+        
+
+    }    
+
+    step(){
+        
+        if (this.index >= this.movePoints.length){
+            return;
+        }
+
+        this._moveTo = this.movePoints[this.index];
+
         this._cancelAnimationFrame(this._raf);
 
-        this._moveFrom = fromPoint;
-        this._moveTo = toPoint;
-
-        if ((this._moveTo.x - this._moveFrom.x) > 0){
+        if ((this._moveTo.x - this.ball.x) > 0){
             this._moveDirection = Direction.Right;
-        }else if ((this._moveTo.x - this._moveFrom.x) < 0){
+        }else if ((this._moveTo.x - this.ball.x) < 0){
             this._moveDirection = Direction.Left;
         }
-        if ((this._moveTo.y - this._moveFrom.y) > 0){
+        if ((this._moveTo.y - this.ball.y) > 0){
             this._moveDirection = Direction.Down;
-        } else if ((this._moveTo.y - this._moveFrom.y) < 0){
+        } else if ((this._moveTo.y - this.ball.y) < 0){
             this._moveDirection = Direction.Up;
         }
 
-
-        this.ball.x = fromPoint.x;
-        this.ball.y = fromPoint.y;
         this._raf = this._requestAnimationFrame(this.draw);
 
-        // this._canvas.addEventListener('mouseover', (e) => {
-        //     this._raf = this._requestAnimationFrame(this.draw);
-        // });
+    }
 
-        // this._canvas.addEventListener('mouseout', (e)=> {
-        //     this._cancelAnimationFrame(this._raf);
-        // });
-    }    
 }

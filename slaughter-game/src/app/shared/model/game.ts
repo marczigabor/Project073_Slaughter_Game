@@ -41,19 +41,25 @@ export class Game {
 
         fromEvent(this._canvas.canvas, 'click')
             .pipe(tap((event: MouseEvent) => {
-                let point = this.getBlockByCoordinate(event.layerX, event.layerY);
+                let block = this.getBlockByCoordinate(event.layerX, event.layerY);
                 console.log(event);
-                console.log(point);
-                console.log(this._map.getValueOfBlock(point.x, point.y));
+                //console.log(point);
+                //console.log(this._map.getValueOfBlock(point.x, point.y));
 
-                let routes = this._map.getRoute(point, new Point(3,3));
+                let ballPoints = this._animation.getBallPoints();
+                let routes = this._map.getRoute(this.getBlockByCoordinate(ballPoints.x, ballPoints.y), block);
                 console.log(routes);
 
-                let pointTo = this.getCoordinateByBlock(point.x, point.y);
-                this._animation.move(new Point(x, y), pointTo);
+                let arrayPoints: Point[] = [];
+                routes.forEach(element => {
+                    arrayPoints.push(this.getCoordinateByBlock(element.x, element.y));
+                });
 
-                x = pointTo.x;
-                y = pointTo.y;
+                //let pointTo = this.getCoordinateByBlock(point.x, point.y);
+                this._animation.move(arrayPoints);
+
+                //x = pointTo.x;
+                //y = pointTo.y;
 
             }))
             .subscribe();
