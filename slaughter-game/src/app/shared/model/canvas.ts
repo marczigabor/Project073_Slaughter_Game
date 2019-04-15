@@ -23,19 +23,18 @@ export class Canvas {
         return this._canvas;
     }
 
+    displayGrid(blockSizeX: number, blockSizeY: number, blockNumberX: number, blockNumberY: number){
 
-    displayGrid(xBlocks: number, yBlocks: number){
-
-        for (let i = 0; i < xBlocks; i++ ) {
+        for (let i = 0; i < blockNumberX; i++ ) {
             this._context.beginPath();
-            this._context.moveTo(i * (this._canvas.width / xBlocks) , 0);
-            this._context.lineTo(i * (this._canvas.width / xBlocks), this._canvas.height);
+            this._context.moveTo(i * blockSizeX , 0);
+            this._context.lineTo(i * blockSizeX, this._canvas.height);
             this._context.stroke();
         }
-        for (let i=0; i<yBlocks; i++ ) {
+        for (let i=0; i < blockNumberY; i++ ) {
             this._context.beginPath();
-            this._context.moveTo(0,  i * (this._canvas.height / yBlocks));
-            this._context.lineTo(this._canvas.width, i * (this._canvas.height / yBlocks));
+            this._context.moveTo(0,  i * blockSizeY);
+            this._context.lineTo(this._canvas.width, i * blockSizeX);
             this._context.stroke();
         }
 

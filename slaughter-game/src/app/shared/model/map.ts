@@ -19,9 +19,17 @@ export class Map {
     generateArray = (x: number, y: number, generateWalls: boolean): number[][] => {
         let array: number[][] = [];
         let j=0;
-        for (let i=0; i < x; i++){
-            array[i] = Array.from(Array(y), () => generateWalls ? this.getRandomInt(0, 1) : 1);
-        }
+        
+        // for (let i=0; i < x; i++){
+        //     array[i] = Array.from(Array(y), () => generateWalls ? this.getRandomInt(0, 1) : 1);
+        // }
+
+
+        array = [[1,1,1,1], 
+                [1,0,0,1],
+                [1,0,0,1],
+                [1,1,1,1],
+            ];
 
         //console.log(array);
         return array;
