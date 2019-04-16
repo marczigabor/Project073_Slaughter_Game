@@ -5,8 +5,10 @@ export class Map {
 
     private _grid: any; //0: wall 
 
+    private wallPercent: number = 20;
+
     constructor(x: number, y: number){
-        this._grid = new Graph(this.generateArray(x, y, false));
+        this._grid = new Graph(this.generateArray(x, y, true));
     }
 
     getRoute = (startPoint: Point, endPoint: Point):any => {
@@ -19,24 +21,35 @@ export class Map {
     generateArray = (x: number, y: number, generateWalls: boolean): number[][] => {
         let array: number[][] = [];
         let j=0;
-        
-        // for (let i=0; i < x; i++){
-        //     array[i] = Array.from(Array(y), () => generateWalls ? this.getRandomInt(0, 1) : 1);
-        // }
 
+        for (let i=0; i < x; i++){
 
-        array = [[1,1,1,1], 
-                [1,0,0,1],
-                [1,0,0,1],
-                [1,1,1,1],
-            ];
+             array[i] = Array.from(Array(y), () => this.getblockValue(generateWalls));
+        }
 
-        //console.log(array);
         return array;
     }
 
     getValueOfBlock = (x: number, y: number): number => { //0: wall; 1: opened
         return this._grid.grid[x][y].weight;
+    }
+
+    private getblockValue (generateWalls: boolean) {
+        let generated: number = 0;
+        let returnValue = 1;
+
+        if (generateWalls){
+            generated = this.getRandomInt(0, 100);
+            if (generated >= this.wallPercent){
+                returnValue = 1;
+            }else{
+                returnValue = 0;
+            }
+        } else {
+            generated = 1;
+        }
+
+        return returnValue;
     }
 
     private clearDirtyNodes = () => {

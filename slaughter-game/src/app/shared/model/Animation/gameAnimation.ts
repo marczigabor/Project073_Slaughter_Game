@@ -1,6 +1,5 @@
 import { Point } from "../point";
-import { Direction } from "../direction";
-import { Sprite } from "./sprite";
+import { DrawObject } from "./drawObject";
 
 export class GameAnimation {
 
@@ -13,67 +12,73 @@ export class GameAnimation {
     private raf: number;
     private canvas: HTMLCanvasElement;
     private context: any; 
-    private sprite: Sprite; 
+    private object: DrawObject; 
 
     private moveTo: Point;
-    private inMove: boolean;
+    //private inMove: boolean;
     private movePoints: Point[];
     private index: number = 0;
+    
+    private blokCountX: number = 0;
+    private blokCountY: number = 0;
 
-    constructor (context: any, canvas: HTMLCanvasElement, sprite: Sprite){
+    constructor (context: any, canvas: HTMLCanvasElement, object: DrawObject, blokCountX: number, blokCountY: number){
         this.canvas = canvas;
         this.context = context;
-        this.sprite = sprite;
+        this.object = object;
+        this.blokCountX = blokCountX;
+        this.blokCountY = blokCountY;
     }
     
-    displayGrid(xBlocks: number, yBlocks: number){
+    // displayGrid(xBlocks: number, yBlocks: number){
 
-        for (let i = 0; i < xBlocks; i++ ) {
-            this.context.beginPath();
-            this.context.moveTo(i * (this.canvas.width / xBlocks) , 0);
-            this.context.lineTo(i * (this.canvas.width / xBlocks), this.canvas.height);
-            this.context.stroke();
-        }
-        for (let i=0; i<yBlocks; i++ ) {
-            this.context.beginPath();
-            this.context.moveTo(0,  i * (this.canvas.height / yBlocks));
-            this.context.lineTo(this.canvas.width, i * (this.canvas.height / yBlocks));
-            this.context.stroke();
-        }
+    //     for (let i = 0; i < xBlocks; i++ ) {
+    //         this.context.beginPath();
+    //         this.context.moveTo(i * (this.canvas.width / xBlocks) , 0);
+    //         this.context.lineTo(i * (this.canvas.width / xBlocks), this.canvas.height);
+    //         this.context.stroke();
+    //     }
+    //     for (let i=0; i<yBlocks; i++ ) {
+    //         this.context.beginPath();
+    //         this.context.moveTo(0,  i * (this.canvas.height / yBlocks));
+    //         this.context.lineTo(this.canvas.width, i * (this.canvas.height / yBlocks));
+    //         this.context.stroke();
+    //     }
 
-    }
+    // }
 
 
     getPoints(): Point{
-        return this.sprite.coord;
+        return this.object.coord;
     }
 
     private draw = ():void => {
-        this.inMove = true;
-        this.context.clearRect(0,0, this.canvas.offsetWidth, this.canvas.height);
+        //this.inMove = true;
+        this.context.clearRect(this.object.coord.x-5, this.object.coord.y-5, this.object.displayWidth+5, this.object.displayHeight+5);
         
-        this.displayGrid(4, 4);        
+        //this.displayGrid(this.blokCountX, this.blokCountY); 
 
-        this.sprite.move(this.moveTo);
-        this.sprite.draw();
+        this.object.move(this.moveTo);
+        this.object.draw();
 
-        if (!this.sprite.isFinished(this.moveTo)){
+        if (!this.object.isFinished(this.moveTo)){
             this.raf = this.requestAnimationFrame(this.draw);
         }else{
-            this.inMove = false;
-            this.sprite.coord.x = this.moveTo.x;
-            this.sprite.coord.y = this.moveTo.y;
+            //this.inMove = false;
+            this.object.coord.x = this.moveTo.x;
+            this.object.coord.y = this.moveTo.y;
             this.index++;
             this.step();
         }
-
     }
     
     move = (movePoints: Point[]): void => {
 
-        if (this.inMove || movePoints.length == 0 ) {
-            return;
-        }
+        // if (this.inMove || movePoints.length == 0 ) {
+        //     return;
+        // }
+
+        this.context.clearRect(this.object.coord.x-50, this.object.coord.y-50, 2*this.object.displayWidth, 2*this.object.displayHeight);
         this.movePoints = movePoints;
         this.index = 0;
         this.step();
@@ -89,7 +94,7 @@ export class GameAnimation {
 
         this.cancelAnimationFrame(this.raf);
 
-        this.sprite.move(this.moveTo);
+        this.object.move(this.moveTo);
 
         this.raf = this.requestAnimationFrame(this.draw);
 

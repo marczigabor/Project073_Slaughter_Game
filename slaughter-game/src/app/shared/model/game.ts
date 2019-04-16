@@ -10,7 +10,7 @@ export class Game {
 
     private _canvas: Canvas;
     private _map: Map;
-    private _animation: GameAnimation;
+    private _animation: GameAnimation[];
 
     constructor(
         widthBlockNumber: number, 
@@ -20,19 +20,25 @@ export class Game {
         ) {
 
             this._map = new Map(widthBlockNumber, heightBlockNumber);
+            this._animation = [];
 
             let containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(containerNode.offsetWidth, containerNode.offsetHeight, backgroundColor);
             containerNode.appendChild(this._canvas.createCanvasNode());
 
-            this._animation = new GameAnimation(this._canvas.context, this._canvas.canvas, this.getCharacter());
-            //console.log( this._map.grid);
+            this._animation.push(new GameAnimation(this._canvas.context, this._canvas.canvas, this.getCharacter(0), widthBlockNumber, heightBlockNumber));
+            this._animation.push(new GameAnimation(this._canvas.context, this._canvas.canvas, this.getCharacter(1), widthBlockNumber, heightBlockNumber));
+            console.log( this._map.grid);
     }
 
-    getCharacter(){
+    getCharacter(num: number){
 
         var image = new Image();
-        image.src = "assets/image/yuffiekisaragi.png";
+        if (num == 1){
+            image.src = "assets/image/yuffiekisaragi.png";
+        } else {
+            image.src = "assets/image/china.png";
+        }
 
         const options: SpriteOptions = {
             context: this.canvas.context,
@@ -41,8 +47,8 @@ export class Game {
             displayHeight: this.blockSizeX,
             displayWidth: this.blockSizeY,
             image: image,
-            speedX: 5,
-            speedY: 5
+            speedX: num == 1 ? 2 : 3,
+            speedY: num == 1 ? 2 : 3
         }
 
         const character = new Sprite(options);
@@ -62,10 +68,6 @@ export class Game {
         let x = 0;
         let y = 0;
 
-        if (displayGrid){
-            this._canvas.displayGrid(this.blockSizeX, this.blockSizeY, this._map.width, this._map.height);
-        }
-
         fromEvent(this._canvas.canvas, 'click')
             .pipe(tap((event: MouseEvent) => {
                 let block = this.getBlockByCoordinate(event.layerX, event.layerY);
@@ -73,20 +75,33 @@ export class Game {
                 //console.log(point);
                 //console.log(this._map.getValueOfBlock(point.x, point.y));
 
-                let ballPoints = this._animation.getPoints();
-                let routes = this._map.getRoute(this.getBlockByCoordinate(ballPoints.x, ballPoints.y), block);
-                console.log(routes);
-
-                let arrayPoints: Point[] = [];
-                routes.forEach(element => {
-                    arrayPoints.push(this.getCoordinateByBlock(element.x, element.y));
+                this._animation.forEach(element => {
+                    let charPoints = element.getPoints();
+                    let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints.x, charPoints.y), block);
+                    console.log(routes);
+    
+                    let arrayPoints: Point[] = [];
+                    routes.forEach(element => {
+                        arrayPoints.push(this.getCoordinateByBlock(element.x, element.y));
+                    });
+    
+                    element.move(arrayPoints);
                 });
 
-                //let pointTo = this.getCoordinateByBlock(point.x, point.y);
-                this._animation.move(arrayPoints);
+                // let charPoints = this._animation.getPoints();
+                // let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints.x, charPoints.y), block);
+                // console.log(routes);
 
-                //x = pointTo.x;
-                //y = pointTo.y;
+                // let arrayPoints: Point[] = [];
+                // routes.forEach(element => {
+                //     arrayPoints.push(this.getCoordinateByBlock(element.x, element.y));
+                // });
+
+                // //let pointTo = this.getCoordinateByBlock(point.x, point.y);
+                // this._animation.move(arrayPoints);
+
+                // //x = pointTo.x;
+                // //y = pointTo.y;
 
             }))
             .subscribe();

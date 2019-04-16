@@ -20,7 +20,8 @@ export class Sprite {
     image: HTMLImageElement;
     ticksPerFrame: number; //fps
     tickCount: number;
-    frameIndex: number;
+    frameRowIndex: number;
+    frameHeightIndex: number;
     frameWidth: number;
     frameHeight: number;
     speedX: number;
@@ -28,8 +29,6 @@ export class Sprite {
     moveDirection: Direction;
 
     coord: Point;
-    //x: number;
-    //y: number;
 
     constructor(options: SpriteOptions){
         this.image = options.image;
@@ -42,20 +41,21 @@ export class Sprite {
         this.speedY = options.speedY;
         this.coord = new Point(0,0);
 
-        this.frameIndex = 0;
+        this.frameRowIndex = 0;
+        this.frameHeightIndex = 0;
         this.tickCount = 0;
         this.ticksPerFrame = 10; 
     }
 
     //32x48
-    draw(){
+    draw(): void{
 
         this.update();
 
         this.context.drawImage(
             this.image, 
-            this.frameIndex * this.frameWidth, 
-            0, 
+            this.frameRowIndex * this.frameWidth, 
+            this.frameHeightIndex * this.frameHeight, 
             this.frameWidth, 
             this.frameHeight, 
             this.coord.x, 
@@ -64,7 +64,7 @@ export class Sprite {
             this.displayHeight);        
     }
 
-    move (moveTo: Point){
+    move (moveTo: Point): void{
 
         if ((moveTo.x - this.coord.x) > 0){
             this.moveDirection = Direction.Right;
@@ -99,14 +99,14 @@ export class Sprite {
         switch (this.moveDirection){
             case Direction.Down:
             case Direction.Up:
-                if (Math.abs(this.coord.y - moveTo.y) >5){
+                if (Math.abs(this.coord.y - moveTo.y) > 2){
                     return false;
                 }else {
                     return true;
                 }
             case Direction.Left:
             case Direction.Right:
-                if (Math.abs(this.coord.x - moveTo.x) > 5){
+                if (Math.abs(this.coord.x - moveTo.x) > 2){
                     return false;
                 }else {
                     return true;
@@ -120,12 +120,28 @@ export class Sprite {
         if (this.tickCount > this.ticksPerFrame) {
         	this.tickCount = 0;
              // Go to the next frame
-            if (this.frameIndex < 3){
-                this.frameIndex += 1;
+            if (this.frameRowIndex < 3){
+                this.frameRowIndex++;
             }else{
-                this.frameIndex = 1;
+                this.frameRowIndex = 1;
             }
         }
+
+        switch (this.moveDirection){
+            case Direction.Down:
+                this.frameHeightIndex = 0;
+                break;
+            case Direction.Up:
+                this.frameHeightIndex = 3;
+                break;
+            case Direction.Left:
+                this.frameHeightIndex = 1;
+                break;
+            case Direction.Right:
+                this.frameHeightIndex = 2;
+                break;
+        }
+
     };     
 
 }
