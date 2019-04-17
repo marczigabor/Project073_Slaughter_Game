@@ -1,5 +1,6 @@
 import { Direction } from "../direction";
 import { Point } from "../point";
+import { Subject } from "rxjs";
 
 export interface SpriteOptions{
     image: HTMLImageElement;
@@ -27,8 +28,12 @@ export class Sprite {
     speedX: number;
     speedY: number;
     moveDirection: Direction;
+    notificationSubject: Subject<any>;
 
     coord: Point;
+
+    private movePoints: Point[];
+    private index: number = 0;
 
     constructor(options: SpriteOptions){
         this.image = options.image;
@@ -45,13 +50,52 @@ export class Sprite {
         this.frameHeightIndex = 0;
         this.tickCount = 0;
         this.ticksPerFrame = 10; 
+        this.movePoints = [];
+        this.index = 0;
+
+        this.notificationSubject = new Subject();
     }
 
-    //32x48
-    draw(): void{
+    getCoords(): Point{
+        return this.coord;
+    }
 
-        this.update();
+    moveArray(moveTo: Point[]): void {
+        this.movePoints = moveTo;
+        this.index = 0;
+        
+        this.notificationSubject.next();
+    }
 
+    update(){
+        if (!this.isFinished()){
+            this.move();
+            this.frameUpdate();
+        }
+        this.draw();
+        this.check();
+    }
+
+    isFinished(): boolean{
+        return this.movePoints.length == 0;
+    }
+
+    private check(): void{
+
+        if (this.isStepFinished()){
+            this.coord.x = this.movePoints[this.index].x;
+            this.coord.y = this.movePoints[this.index].y;
+            this.draw();
+            this.index++;
+        }
+
+        if (this.movePoints.length && this.index >= this.movePoints.length){
+            this.index = 0;
+            this.movePoints = [];
+        }
+    }
+
+    private draw(): void{
         this.context.drawImage(
             this.image, 
             this.frameRowIndex * this.frameWidth, 
@@ -64,58 +108,64 @@ export class Sprite {
             this.displayHeight);        
     }
 
-    move (moveTo: Point): void{
+    private move(): void{
 
-        if ((moveTo.x - this.coord.x) > 0){
-            this.moveDirection = Direction.Right;
-        }else if ((moveTo.x - this.coord.x) < 0){
-            this.moveDirection = Direction.Left;
-        }
-        if ((moveTo.y - this.coord.y) > 0){
-            this.moveDirection = Direction.Down;
-        } else if ((moveTo.y - this.coord.y) < 0){
-            this.moveDirection = Direction.Up;
-        }
+        let moveTo = this.movePoints[this.index];
+        //direction
+        if (moveTo){
+            if ((moveTo.x - this.coord.x) > 0){
+                this.moveDirection = Direction.Right;
+            }else if ((moveTo.x - this.coord.x) < 0){
+                this.moveDirection = Direction.Left;
+            }
+            if ((moveTo.y - this.coord.y) > 0){
+                this.moveDirection = Direction.Down;
+            } else if ((moveTo.y - this.coord.y) < 0){
+                this.moveDirection = Direction.Up;
+            }
 
-
-        switch (this.moveDirection){
-            case Direction.Down:
-                this.coord.y += this.speedY;
-                break;
-            case Direction.Up:
-                this.coord.y -= this.speedY;
-                break;
-            case Direction.Left:
-                this.coord.x -= this.speedX;
-                break;
-            case Direction.Right:
-                this.coord.x += this.speedX;
-                break;
-        }
-    }
-
-    isFinished(moveTo: Point): boolean{
-
-        switch (this.moveDirection){
-            case Direction.Down:
-            case Direction.Up:
-                if (Math.abs(this.coord.y - moveTo.y) > 2){
-                    return false;
-                }else {
-                    return true;
-                }
-            case Direction.Left:
-            case Direction.Right:
-                if (Math.abs(this.coord.x - moveTo.x) > 2){
-                    return false;
-                }else {
-                    return true;
-                }
+            //move
+            switch (this.moveDirection){
+                case Direction.Down:
+                    this.coord.y += this.speedY;
+                    break;
+                case Direction.Up:
+                    this.coord.y -= this.speedY;
+                    break;
+                case Direction.Left:
+                    this.coord.x -= this.speedX;
+                    break;
+                case Direction.Right:
+                    this.coord.x += this.speedX;
+                    break;
+            }
         }
     }
 
+    private isStepFinished(): boolean{
 
-    private update(){
+        if (this.movePoints.length){
+            switch (this.moveDirection){
+                case Direction.Down:
+                case Direction.Up:
+                    if (Math.abs(this.coord.y - this.movePoints[this.index].y) > 2){
+                        return false;
+                    }else {
+                        return true;
+                    }
+                case Direction.Left:
+                case Direction.Right:
+                    if (Math.abs(this.coord.x - this.movePoints[this.index].x) > 2){
+                        return false;
+                    }else {
+                        return true;
+                    }
+            }
+        }
+    }
+
+
+    private frameUpdate(){
         this.tickCount += 1;
         if (this.tickCount > this.ticksPerFrame) {
         	this.tickCount = 0;

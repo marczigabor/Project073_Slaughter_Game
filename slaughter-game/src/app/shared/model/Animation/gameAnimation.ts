@@ -1,4 +1,3 @@
-import { Point } from "../point";
 import { DrawObject } from "./drawObject";
 
 export class GameAnimation {
@@ -7,27 +6,17 @@ export class GameAnimation {
             window.webkitRequestAnimationFrame;
     
     private cancelAnimationFrame = window.cancelAnimationFrame ||
-            window.webkitCancelAnimationFrame;
+             window.webkitCancelAnimationFrame;
 
     private raf: number;
     private canvas: HTMLCanvasElement;
     private context: any; 
-    private object: DrawObject; 
+    private objects: DrawObject[]; 
 
-    private moveTo: Point;
-    //private inMove: boolean;
-    private movePoints: Point[];
-    private index: number = 0;
-    
-    private blokCountX: number = 0;
-    private blokCountY: number = 0;
-
-    constructor (context: any, canvas: HTMLCanvasElement, object: DrawObject, blokCountX: number, blokCountY: number){
+    constructor (canvas: HTMLCanvasElement, context: any){
+        this.objects = [];
         this.canvas = canvas;
         this.context = context;
-        this.object = object;
-        this.blokCountX = blokCountX;
-        this.blokCountY = blokCountY;
     }
     
     // displayGrid(xBlocks: number, yBlocks: number){
@@ -47,57 +36,32 @@ export class GameAnimation {
 
     // }
 
+    addDrawObject(object: DrawObject){
 
-    getPoints(): Point{
-        return this.object.coord;
+        object.notificationSubject.subscribe(
+            () => {this.draw()}
+        );
+
+        this.objects.push(object);
     }
 
     private draw = ():void => {
-        //this.inMove = true;
-        this.context.clearRect(this.object.coord.x-5, this.object.coord.y-5, this.object.displayWidth+5, this.object.displayHeight+5);
+        let isMoving: boolean = false;
         
-        //this.displayGrid(this.blokCountX, this.blokCountY); 
-
-        this.object.move(this.moveTo);
-        this.object.draw();
-
-        if (!this.object.isFinished(this.moveTo)){
-            this.raf = this.requestAnimationFrame(this.draw);
-        }else{
-            //this.inMove = false;
-            this.object.coord.x = this.moveTo.x;
-            this.object.coord.y = this.moveTo.y;
-            this.index++;
-            this.step();
-        }
-    }
-    
-    move = (movePoints: Point[]): void => {
-
-        // if (this.inMove || movePoints.length == 0 ) {
-        //     return;
-        // }
-
-        this.context.clearRect(this.object.coord.x-50, this.object.coord.y-50, 2*this.object.displayWidth, 2*this.object.displayHeight);
-        this.movePoints = movePoints;
-        this.index = 0;
-        this.step();
-    }    
-
-    step(){
-        
-        if (this.index >= this.movePoints.length){
-            return;
-        }
-
-        this.moveTo = this.movePoints[this.index];
-
         this.cancelAnimationFrame(this.raf);
 
-        this.object.move(this.moveTo);
+        this.context.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
 
-        this.raf = this.requestAnimationFrame(this.draw);
+        this.objects.forEach (object => {
 
+            object.update();
+            if (!isMoving){
+                isMoving = !object.isFinished();
+            }
+        });  
+        
+        if (isMoving){
+            this.raf = this.requestAnimationFrame(this.draw);
+        } 
     }
-
 }

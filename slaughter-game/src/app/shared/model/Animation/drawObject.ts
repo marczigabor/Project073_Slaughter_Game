@@ -1,10 +1,10 @@
 import { Point } from "../point";
+import { Subject } from "rxjs";
 
 export interface DrawObject{
-    draw(): void;
-    move (moveTo: Point): void;
-    isFinished(moveTo: Point): boolean;
-    readonly coord: Point;
-    readonly displayWidth: number;
-    readonly displayHeight: number;    
+    update(): void;
+    moveArray(moveTo: Point[]): void;
+    isFinished(): boolean;
+    getCoords(): Point;
+    readonly notificationSubject: Subject<any>;
 }
