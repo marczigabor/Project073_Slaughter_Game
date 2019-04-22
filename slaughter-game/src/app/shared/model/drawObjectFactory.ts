@@ -4,6 +4,7 @@ import { Point } from "./point";
 import { DrawObject } from "./Animation/drawObject";
 import { Field } from "./Animation/field";
 import { Map } from "./map";
+import { Injector } from "@angular/core";
 
 export class DrawObjectFactory{
 
@@ -88,7 +89,7 @@ export class DrawObjectFactory{
                 image.src = "assets/image/characters/china.png";    
                 break;
         }
-        const speed = (Math.random() * 4) + 0.5;
+        const speed = (Math.random() * 2) + 1;
         const options: DrawObjectOptions = {
             context: this.context,
             frameHeight: 48,
@@ -99,8 +100,8 @@ export class DrawObjectFactory{
             speedX: speed,
             speedY: speed,
             coord:{
-                x: 0, //(Math.random() * this.canvasSize.x) + 1,
-                y: 0 //(Math.random() * this.canvasSize.y) + 1
+                x: (Math.random() * this.canvasSize.x) + 1,
+                y: (Math.random() * this.canvasSize.y) + 1
             }
         }
 

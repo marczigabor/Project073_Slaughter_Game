@@ -45,11 +45,11 @@ export class Game {
 
             //characters
             this._objects.push(this._drawObjectFactory.getCharacter(0));
-            // this._objects.push(this._drawObjectFactory.getCharacter(1));
-            // this._objects.push(this._drawObjectFactory.getCharacter(2));
-            // this._objects.push(this._drawObjectFactory.getCharacter(3));
-            // this._objects.push(this._drawObjectFactory.getCharacter(4));
-            // this._objects.push(this._drawObjectFactory.getCharacter(5));
+            this._objects.push(this._drawObjectFactory.getCharacter(1));
+            this._objects.push(this._drawObjectFactory.getCharacter(2));
+            this._objects.push(this._drawObjectFactory.getCharacter(3));
+            this._objects.push(this._drawObjectFactory.getCharacter(4));
+            this._objects.push(this._drawObjectFactory.getCharacter(5));
 
             this._objects.forEach (item => {
                 this._animation.addDrawObject(item);

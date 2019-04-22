@@ -40,7 +40,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.frameRowIndex = 0;
         this.frameHeightIndex = 0;
         this.tickCount = 0;
-        this.ticksPerFrame = 10; 
+        this.ticksPerFrame = 7; 
         this.movePoints = [];
         this.index = 0;
 
