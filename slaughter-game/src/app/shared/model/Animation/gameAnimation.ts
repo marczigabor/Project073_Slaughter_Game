@@ -12,6 +12,8 @@ export class GameAnimation {
     private canvas: HTMLCanvasElement;
     private context: any; 
     private objects: DrawObject[]; 
+    private isObjectsMoving: boolean;
+
 
     constructor (canvas: HTMLCanvasElement, context: any){
         this.objects = [];
@@ -39,15 +41,20 @@ export class GameAnimation {
     addDrawObject(object: DrawObject){
 
         object.notificationSubject.subscribe(
-            () => {this.draw()}
+            () => {
+                if (!this.isObjectsMoving){
+                    this.draw()
+                }
+            }
         );
 
         this.objects.push(object);
     }
 
     private draw = ():void => {
-        let isMoving: boolean = false;
-        
+
+        this.isObjectsMoving = false;
+
         this.cancelAnimationFrame(this.raf);
 
         this.context.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
@@ -55,12 +62,12 @@ export class GameAnimation {
         this.objects.forEach (object => {
 
             object.update();
-            if (!isMoving){
-                isMoving = !object.isFinished();
+            if (!this.isObjectsMoving){
+                this.isObjectsMoving = !object.isFinished();
             }
         });  
         
-        if (isMoving){
+        if (this.isObjectsMoving){
             this.raf = this.requestAnimationFrame(this.draw);
         } 
     }

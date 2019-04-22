@@ -6,5 +6,7 @@ export interface DrawObject{
     moveArray(moveTo: Point[]): void;
     isFinished(): boolean;
     getCoords(): Point;
+    readonly speedX: number;
+    readonly speedY: number;
     readonly notificationSubject: Subject<any>;
 }

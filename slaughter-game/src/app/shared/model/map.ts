@@ -3,7 +3,7 @@ import { Point } from "./point";
 
 export class Map {
 
-    private _grid: any; //0: wall 
+    private _grid: Graph; //0: wall 
 
     private wallPercent: number = 20;
 
@@ -31,7 +31,7 @@ export class Map {
     }
 
     getValueOfBlock = (x: number, y: number): number => { //0: wall; 1: opened
-        return this._grid.grid[x][y].weight;
+        return this._grid.grid[y][x].weight;
     }
 
     private getblockValue (generateWalls: boolean) {
@@ -64,7 +64,7 @@ export class Map {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }    
 
-    get grid(): any{
+    get grid(): Graph{
         return this._grid;
     }
 

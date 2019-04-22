@@ -1,19 +1,10 @@
 import { Direction } from "../direction";
 import { Point } from "../point";
 import { Subject } from "rxjs";
+import { DrawObjectOptions } from "./drawObjectOptions";
+import { DrawObject } from "./drawObject";
 
-export interface SpriteOptions{
-    image: HTMLImageElement;
-    displayWidth: number; 
-    displayHeight: number; 
-    context: any;
-    frameWidth: number;
-    frameHeight: number;
-    speedX: number;
-    speedY: number;
-}
-
-export class Sprite {
+export class Sprite3x3 implements  DrawObject  {
 
     context: any;
     displayWidth: number;
@@ -35,7 +26,7 @@ export class Sprite {
     private movePoints: Point[];
     private index: number = 0;
 
-    constructor(options: SpriteOptions){
+    constructor(options: DrawObjectOptions){
         this.image = options.image;
         this.displayWidth = options.displayWidth;
         this.displayHeight = options.displayHeight;
@@ -44,7 +35,7 @@ export class Sprite {
         this.frameHeight = options.frameHeight;
         this.speedX = options.speedX;
         this.speedY = options.speedY;
-        this.coord = new Point(0,0);
+        this.coord = options.coord;
 
         this.frameRowIndex = 0;
         this.frameHeightIndex = 0;
