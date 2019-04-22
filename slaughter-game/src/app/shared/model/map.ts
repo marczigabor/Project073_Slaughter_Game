@@ -31,7 +31,7 @@ export class Map {
     }
 
     getValueOfBlock = (x: number, y: number): number => { //0: wall; 1: opened
-        return this._grid.grid[y][x].weight;
+        return this._grid.grid[x][y].weight;
     }
 
     private getblockValue (generateWalls: boolean) {
@@ -69,11 +69,14 @@ export class Map {
     }
 
     get width(): number{
-        return this._grid.grid[0].length;
+        //return this._grid.grid[0].length;
+        return this._grid.grid.length;
     }
 
     get height(): number{
-        return this._grid.grid.length;
+        //return this._grid.grid.length;
+        return this._grid.grid[0].length;
+
     }
 
 }

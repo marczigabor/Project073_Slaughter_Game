@@ -99,8 +99,8 @@ export class DrawObjectFactory{
             speedX: speed,
             speedY: speed,
             coord:{
-                x: (Math.random() * this.canvasSize.x) + 1,
-                y: (Math.random() * this.canvasSize.y) + 1
+                x: 0, //(Math.random() * this.canvasSize.x) + 1,
+                y: 0 //(Math.random() * this.canvasSize.y) + 1
             }
         }
 
