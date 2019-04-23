@@ -9,4 +9,6 @@ export interface DrawObject{
     readonly speedX: number;
     readonly speedY: number;
     readonly notificationSubject: Subject<any>;
+    readonly name: string;
 }
+

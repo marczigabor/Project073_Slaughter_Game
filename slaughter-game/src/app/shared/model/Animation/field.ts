@@ -20,7 +20,7 @@ export class Field implements  DrawObject  {
     speedX: number;
     speedY: number;
     coord: Point;
-
+    name: string;
 
     constructor(options: DrawObjectOptions){
         this.image = options.image;

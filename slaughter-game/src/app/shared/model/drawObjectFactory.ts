@@ -89,7 +89,7 @@ export class DrawObjectFactory{
                 image.src = "assets/image/characters/china.png";    
                 break;
         }
-        const speed = (Math.random() * 2) + 1;
+        const speed = (Math.random() * 1) + 0.2;
         const options: DrawObjectOptions = {
             context: this.context,
             frameHeight: 48,
@@ -102,7 +102,8 @@ export class DrawObjectFactory{
             coord:{
                 x: (Math.random() * this.canvasSize.x) + 1,
                 y: (Math.random() * this.canvasSize.y) + 1
-            }
+            },
+            name: image.src.split('/')[6],
         }
 
         const character = new Sprite3x3(options);

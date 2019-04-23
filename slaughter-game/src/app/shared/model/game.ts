@@ -66,42 +66,56 @@ export class Game {
         return this._canvas.height / this._map.height;
     }
 
-    display(displayGrid?: boolean): void {
+    display(): void {
 
         let x = 0;
         let y = 0;
 
         fromEvent(this._canvas.canvas, 'click')
             .pipe(tap((event: MouseEvent) => {
-                let block = this.getBlockByCoordinate(event.layerX, event.layerY);
-                console.log(event);
 
-                this._objects.forEach(element => {
+                let found: boolean = false;
+                let block: Point = this.getBlockByCoordinate(new Point(event.layerX, event.layerY));
 
-                    if (element.speedX != 0 && element.speedY != 0 ){
-                        let charPoints = element.getCoords();
-                        let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints.x, charPoints.y), block);
-                        console.log(routes);
-        
-                        let arrayPoints: Point[] = [];
-                        routes.forEach(element => {
-                            arrayPoints.push(this.getCoordinateByBlock(element.x, element.y));
-                        });
-        
-                        element.moveArray(arrayPoints);
+                this._objects.forEach (item=> {
+                    const point = item.getCoords();
+                    const charBlock = this.getBlockByCoordinate(point);
+                    if (item.speedX != 0 && item.speedY != 0 && charBlock.x == block.x && charBlock.y == block.y){
+                        console.log(item.name);
+                        found = true;
                     }
-                });
+                });    
+
+                //console.log(event);
+
+                if (!found){
+                    this._objects.forEach(element => {
+
+                        if (element.speedX != 0 && element.speedY != 0 ){
+                            let charPoints = element.getCoords();
+                            let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints), block);
+                            //console.log(routes);
+            
+                            let arrayPoints: Point[] = [];
+                            routes.forEach(element => {
+                                arrayPoints.push(this.getCoordinateByBlock(element));
+                            });
+            
+                            element.moveArray(arrayPoints);
+                        }
+                    });
+                }
 
             }))
             .subscribe();
     }
 
-    private getBlockByCoordinate(x: number, y: number): Point {
-        return new Point(Math.floor( x / this.blockSizeX), Math.floor (y / this.blockSizeY));
+    private getBlockByCoordinate(point: Point): Point {
+        return new Point(Math.floor( point.x / this.blockSizeX), Math.floor (point.y / this.blockSizeY));
     }
 
-    private getCoordinateByBlock(x: number, y: number): Point {
-        return new Point( x * this.blockSizeX, y * this.blockSizeY);
+    private getCoordinateByBlock(point: Point): Point {
+        return new Point( point.x * this.blockSizeX, point.y * this.blockSizeY);
     }
 
     get canvas(): Canvas {
