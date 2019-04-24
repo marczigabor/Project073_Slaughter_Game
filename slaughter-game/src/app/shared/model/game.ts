@@ -39,17 +39,17 @@ export class Game {
 
 
             //fields
-            this._drawObjectFactory.getFields(this._map).forEach(item => {
-                this._objects.push(item);
-            })   
+            // this._drawObjectFactory.getFields(this._map).forEach(item => {
+            //     this._objects.push(item);
+            // })   
 
             //characters
             this._objects.push(this._drawObjectFactory.getCharacter(0));
-            this._objects.push(this._drawObjectFactory.getCharacter(1));
-            this._objects.push(this._drawObjectFactory.getCharacter(2));
-            this._objects.push(this._drawObjectFactory.getCharacter(3));
-            this._objects.push(this._drawObjectFactory.getCharacter(4));
-            this._objects.push(this._drawObjectFactory.getCharacter(5));
+            // this._objects.push(this._drawObjectFactory.getCharacter(1));
+            // this._objects.push(this._drawObjectFactory.getCharacter(2));
+            // this._objects.push(this._drawObjectFactory.getCharacter(3));
+            // this._objects.push(this._drawObjectFactory.getCharacter(4));
+            // this._objects.push(this._drawObjectFactory.getCharacter(5));
 
             this._objects.forEach (item => {
                 this._animation.addDrawObject(item);
@@ -70,6 +70,8 @@ export class Game {
 
         let x = 0;
         let y = 0;
+
+        this._animation.init();
 
         fromEvent(this._canvas.canvas, 'click')
             .pipe(tap((event: MouseEvent) => {

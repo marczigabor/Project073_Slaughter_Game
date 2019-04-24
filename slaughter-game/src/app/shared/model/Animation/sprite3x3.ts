@@ -61,6 +61,8 @@ export class Sprite3x3 implements  DrawObject  {
     }
 
     update(){
+
+        this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
         if (!this.isFinished()){
             this.move();
             this.frameUpdate();
@@ -75,10 +77,15 @@ export class Sprite3x3 implements  DrawObject  {
 
     private check(): void{
 
-        if (this.isStepFinished()){
+        if (this.isStepFinished() && this.movePoints.length) {
+            this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
+
             this.coord.x = this.movePoints[this.index].x;
             this.coord.y = this.movePoints[this.index].y;
+            
+            //this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
             this.draw();
+            
             this.index++;
         }
 
@@ -106,11 +113,13 @@ export class Sprite3x3 implements  DrawObject  {
         let moveTo = this.movePoints[this.index];
         //direction
         if (moveTo){
+            
             if ((moveTo.x - this.coord.x) > 0){
                 this.moveDirection = Direction.Right;
             }else if ((moveTo.x - this.coord.x) < 0){
                 this.moveDirection = Direction.Left;
             }
+            
             if ((moveTo.y - this.coord.y) > 0){
                 this.moveDirection = Direction.Down;
             } else if ((moveTo.y - this.coord.y) < 0){
@@ -154,7 +163,9 @@ export class Sprite3x3 implements  DrawObject  {
                         return true;
                     }
             }
-        }
+        }else {
+            return true;
+        }  
     }
 
 

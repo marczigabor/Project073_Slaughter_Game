@@ -89,7 +89,7 @@ export class DrawObjectFactory{
                 image.src = "assets/image/characters/china.png";    
                 break;
         }
-        const speed = (Math.random() * 1) + 0.2;
+        const speed = 2.5;//(Math.random() * 3) + 0.2;
         const options: DrawObjectOptions = {
             context: this.context,
             frameHeight: 48,
