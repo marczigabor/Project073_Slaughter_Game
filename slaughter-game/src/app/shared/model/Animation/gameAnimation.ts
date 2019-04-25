@@ -13,7 +13,7 @@ export class GameAnimation {
     private context: any; 
     private objects: DrawObject[]; 
     private isObjectsMoving: boolean;
-    private start: number;
+    private init1: boolean = true;
 
     constructor (canvas: HTMLCanvasElement, context: any){
         this.objects = [];
@@ -42,7 +42,7 @@ export class GameAnimation {
 
         object.notificationSubject.subscribe(
             () => {
-                this.requestAnimationFrame(this.draw)
+                this.requestAnimationFrame(this.draw);
                 // if (!this.isObjectsMoving){
 
                 //     this.draw(0);
@@ -71,14 +71,18 @@ export class GameAnimation {
 
         this.objects.forEach (object => {
 
-            object.update();
+            if (this.init1 || (object.speedX > 0 && object.speedY > 0)){
+                 object.update();
+            }
             if (!this.isObjectsMoving){
                 this.isObjectsMoving = !object.isFinished();
             }
         });  
-        
-        if ( this.isObjectsMoving){
+        this.init1 = false;
+
+        if (this.isObjectsMoving){
             this.raf = this.requestAnimationFrame(this.draw);
         } 
+
     }
 }
