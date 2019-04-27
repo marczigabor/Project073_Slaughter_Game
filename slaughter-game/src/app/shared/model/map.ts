@@ -5,7 +5,7 @@ export class Map {
 
     private _grid: Graph; //0: wall 
 
-    private wallPercent: number = 20;
+    private wallPercent: number = 25;
 
     constructor(x: number, y: number){
         this._grid = new Graph(this.generateArray(x, y, true));

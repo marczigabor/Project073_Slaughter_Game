@@ -3,7 +3,6 @@ import { Point } from "../point";
 import { Subject } from "rxjs";
 import { DrawObjectOptions } from "./drawObjectOptions";
 import { DrawObject } from "./drawObject";
-import { moveCursor } from "readline";
 
 export class Sprite3x3 implements  DrawObject  {
 
@@ -66,7 +65,7 @@ export class Sprite3x3 implements  DrawObject  {
 
     update(){
 
-        this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
+        //this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
 
         if (!this.isFinished()){
             this.move();
@@ -83,13 +82,6 @@ export class Sprite3x3 implements  DrawObject  {
     private check(): void{
 
         if (this.isStepFinished() && this.movePoints.length) {
-            //this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
-
-            //this.coord.x = this.movePoints[this.index].x;
-            //this.coord.y = this.movePoints[this.index].y;
-            
-            //this.draw(); 
-            //console.log("this.index++;");
             this.index++;
         }
 
@@ -133,26 +125,7 @@ export class Sprite3x3 implements  DrawObject  {
             }
 
             this.moveTo = moveToNew;
-
-        //direction
-            // if (this.moveTo){
-            //     if ((this.moveTo.x - this.coord.x) > 0){
-            //         this.moveDirection = Direction.Right;
-            //         console.log("Direction.Right;");
-            //     }else if ((this.moveTo.x - this.coord.x) < 0){
-            //         this.moveDirection = Direction.Left;
-            //         console.log("Direction.Left;");
-            //     }
-                
-            //     if ((this.moveTo.y - this.coord.y) > 0){
-            //         this.moveDirection = Direction.Down;
-            //         console.log("Direction.Down;");
-            //     } else if ((this.moveTo.y - this.coord.y) < 0){
-            //         this.moveDirection = Direction.Up;
-            //         console.log("Direction.Up;");
-            //     }
-
-            // }
+      
         }
 
         //move
@@ -181,13 +154,13 @@ export class Sprite3x3 implements  DrawObject  {
             //TODO 
             switch (this.moveDirection){
                 case Direction.Down:
-                    return yDiff >= 5;
+                    return yDiff >= this.speedY;
                 case Direction.Up:
-                    return yDiff <= 5;
+                    return yDiff <= this.speedY;
                 case Direction.Left:
-                    return xDiff <= 5;
+                    return xDiff <= this.speedX;
                 case Direction.Right:
-                    return xDiff >= 5;
+                    return xDiff >= this.speedX;
             }
         }else {
             return true;
@@ -221,7 +194,5 @@ export class Sprite3x3 implements  DrawObject  {
                 this.frameHeightIndex = 2;
                 break;
         }
-
     };     
-
 }

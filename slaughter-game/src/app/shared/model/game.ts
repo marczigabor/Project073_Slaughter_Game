@@ -5,7 +5,8 @@ import { Point } from './point';
 import { Map } from './map';
 import { GameAnimation } from './Animation/gameAnimation';
 import { DrawObject } from './Animation/drawObject';
-import { DrawObjectFactory } from './drawObjectFactory';
+import { ObjectCreatorService } from '../service/object-creator.service';
+import { ImageLoaderService } from '../service/image-loader.service';
 
 export class Game {
 
@@ -13,7 +14,7 @@ export class Game {
     private _map: Map;
     private _animation: GameAnimation;
     private _objects: DrawObject[];
-    private _drawObjectFactory: DrawObjectFactory;
+    private _drawObjectFactory: ObjectCreatorService;
 
     constructor(
         widthBlockNumber: number, 
@@ -24,56 +25,51 @@ export class Game {
 
             this._objects = [];
             this._map = new Map(widthBlockNumber, heightBlockNumber);
-
             let containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(containerNode, backgroundColor);
-
             this._animation = new GameAnimation(this.canvas.canvas, this.canvas.context);
+            this._drawObjectFactory = new ObjectCreatorService(new ImageLoaderService());
 
-            this._drawObjectFactory = new DrawObjectFactory(
-                this._canvas.context, 
-                this._canvas.contextBackground, 
-                new Point(widthBlockNumber, heightBlockNumber), 
-                new Point(this._canvas.canvas.width, this._canvas.canvas.height)
-            );
-
-
-            var that = this;
-            //fields
-            this._drawObjectFactory.getFields(this._map).then((items: DrawObject[]) => {
-                
-                items.forEach(item => {
-                    that._objects.push(item);
-                });
-
-                that._objects.forEach (obj => {
-                    that._animation.addDrawObject(obj);
-               });
-               return 0;
-
-            }).then(() => {
-                that._drawObjectFactory.getCharacter(0).then((item: DrawObject)=> {
-
-                    that._objects.push(item);
-    
-                    that._objects.forEach (item => {
-                        this._animation.addDrawObject(item);
-                    });
-                });
-                return 0;
-            }).then(() => {
-                that._animation.init();
-            });   
+            this.loadDrawObjects();
 
             //characters
-            // this._objects.push(this._drawObjectFactory.getCharacter(1));
-            // this._objects.push(this._drawObjectFactory.getCharacter(2));
-            // this._objects.push(this._drawObjectFactory.getCharacter(3));
-            // this._objects.push(this._drawObjectFactory.getCharacter(4));
-            // this._objects.push(this._drawObjectFactory.getCharacter(5));
 
 
             console.log( this._map.grid);
+    }
+
+    private loadDrawObjects(): void{
+        var that = this;
+        //fields
+        this._drawObjectFactory.getFields(
+            this._map, 
+            this._canvas.contextBackground, 
+            new Point(this.blockSizeX, this.blockSizeY) ).then((items: DrawObject[]) => {
+            
+            items.forEach(item => {
+                that._objects.push(item);
+                that._animation.addDrawObject(item);
+            });
+
+           return 0;
+
+        }).then(() => {
+            that._drawObjectFactory.getCharacters(
+                    this.canvas.context,
+                    new Point((Math.random() * this.canvas.width) + 1, (Math.random() * this.canvas.height) + 1),
+                    new Point(this.blockSizeX, this.blockSizeY)
+                ).then((items: DrawObject[])=> {
+
+                items.forEach ((item) =>{
+                    that._objects.push(item);
+                    this._animation.addDrawObject(item);
+                });
+            });
+            return 0;
+
+        }).then(() => {
+            that._animation.init();
+        });           
     }
 
     get blockSizeX(){
@@ -88,7 +84,6 @@ export class Game {
 
         let x = 0;
         let y = 0;
-
 
         fromEvent(this._canvas.canvas, 'mousemove')
         .pipe(tap((event: MouseEvent) => {
