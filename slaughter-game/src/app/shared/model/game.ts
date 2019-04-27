@@ -5,7 +5,8 @@ import { Point } from './point';
 import { Map } from './map';
 import { GameAnimation } from './Animation/gameAnimation';
 import { DrawObject } from './Animation/drawObject';
-import { DrawObjectFactory } from './drawObjectFactory';
+import { ObjectCreatorService } from '../service/object-creator.service';
+import { ImageLoaderService } from '../service/image-loader.service';
 
 export class Game {
 
@@ -13,7 +14,7 @@ export class Game {
     private _map: Map;
     private _animation: GameAnimation;
     private _objects: DrawObject[];
-    private _drawObjectFactory: DrawObjectFactory;
+    private _drawObjectFactory: ObjectCreatorService;
 
     constructor(
         widthBlockNumber: number, 
@@ -24,38 +25,51 @@ export class Game {
 
             this._objects = [];
             this._map = new Map(widthBlockNumber, heightBlockNumber);
-
             let containerNode = document.getElementById(containerId);
-            this._canvas = new Canvas(containerNode.offsetWidth, containerNode.offsetHeight, backgroundColor);
-            containerNode.appendChild(this._canvas.createCanvasNode());
-
+            this._canvas = new Canvas(containerNode, backgroundColor);
             this._animation = new GameAnimation(this.canvas.canvas, this.canvas.context);
+            this._drawObjectFactory = new ObjectCreatorService(new ImageLoaderService());
 
-            this._drawObjectFactory = new DrawObjectFactory(
-                this._canvas.context, 
-                new Point(widthBlockNumber, heightBlockNumber), 
-                new Point(this._canvas.canvas.width, this._canvas.canvas.height)
-                );
-
-
-            //fields
-            this._drawObjectFactory.getFields(this._map).forEach(item => {
-                this._objects.push(item);
-            })   
+            this.loadDrawObjects();
 
             //characters
-            this._objects.push(this._drawObjectFactory.getCharacter(0));
-            this._objects.push(this._drawObjectFactory.getCharacter(1));
-            this._objects.push(this._drawObjectFactory.getCharacter(2));
-            this._objects.push(this._drawObjectFactory.getCharacter(3));
-            this._objects.push(this._drawObjectFactory.getCharacter(4));
-            this._objects.push(this._drawObjectFactory.getCharacter(5));
 
-            this._objects.forEach (item => {
-                this._animation.addDrawObject(item);
-            });
 
             console.log( this._map.grid);
+    }
+
+    private loadDrawObjects(): void{
+        var that = this;
+        //fields
+        this._drawObjectFactory.getFields(
+            this._map, 
+            this._canvas.contextBackground, 
+            new Point(this.blockSizeX, this.blockSizeY) ).then((items: DrawObject[]) => {
+            
+            items.forEach(item => {
+                that._objects.push(item);
+                that._animation.addDrawObject(item);
+            });
+
+           return 0;
+
+        }).then(() => {
+            that._drawObjectFactory.getCharacters(
+                    this.canvas.context,
+                    new Point((Math.random() * this.canvas.width) + 1, (Math.random() * this.canvas.height) + 1),
+                    new Point(this.blockSizeX, this.blockSizeY)
+                ).then((items: DrawObject[])=> {
+
+                items.forEach ((item) =>{
+                    that._objects.push(item);
+                    this._animation.addDrawObject(item);
+                });
+            });
+            return 0;
+
+        }).then(() => {
+            that._animation.init();
+        });           
     }
 
     get blockSizeX(){
@@ -71,20 +85,26 @@ export class Game {
         let x = 0;
         let y = 0;
 
+        fromEvent(this._canvas.canvas, 'mousemove')
+        .pipe(tap((event: MouseEvent) => {
+            console.log(event.x + " " + event.y);
+        }));
+
+
         fromEvent(this._canvas.canvas, 'click')
             .pipe(tap((event: MouseEvent) => {
 
                 let found: boolean = false;
                 let block: Point = this.getBlockByCoordinate(new Point(event.layerX, event.layerY));
 
-                this._objects.forEach (item=> {
-                    const point = item.getCoords();
-                    const charBlock = this.getBlockByCoordinate(point);
-                    if (item.speedX != 0 && item.speedY != 0 && charBlock.x == block.x && charBlock.y == block.y){
-                        console.log(item.name);
-                        found = true;
-                    }
-                });    
+                // this._objects.forEach (item=> {
+                //     const point = item.getCoords();
+                //     const charBlock = this.getBlockByCoordinate(point);
+                //     if (item.speedX != 0 && item.speedY != 0 && charBlock.x == block.x && charBlock.y == block.y){
+                //         console.log(item.name);
+                //         found = true;
+                //     }
+                // });    
 
                 //console.log(event);
 
@@ -94,7 +114,7 @@ export class Game {
                         if (element.speedX != 0 && element.speedY != 0 ){
                             let charPoints = element.getCoords();
                             let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints), block);
-                            //console.log(routes);
+                            console.log(routes);
             
                             let arrayPoints: Point[] = [];
                             routes.forEach(element => {

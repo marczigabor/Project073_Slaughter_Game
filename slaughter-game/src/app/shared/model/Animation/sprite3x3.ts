@@ -21,6 +21,7 @@ export class Sprite3x3 implements  DrawObject  {
     moveDirection: Direction;
     notificationSubject: Subject<any>;
     name: string;
+    moveTo: Point;
 
     coord: Point;
 
@@ -37,6 +38,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.speedX = options.speedX;
         this.speedY = options.speedY;
         this.coord = options.coord;
+        this.moveTo = this.coord;
         this.name = options.name;
 
         this.frameRowIndex = 0;
@@ -45,6 +47,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.ticksPerFrame = 7; 
         this.movePoints = [];
         this.index = 0;
+        this.moveTo
 
         this.notificationSubject = new Subject();
     }
@@ -54,18 +57,21 @@ export class Sprite3x3 implements  DrawObject  {
     }
 
     moveArray(moveTo: Point[]): void {
-        this.movePoints = moveTo;
         this.index = 0;
+        this.movePoints = moveTo;
         
         this.notificationSubject.next();
     }
 
     update(){
+
+        //this.context.clearRect(this.coord.x, this.coord.y, this.displayWidth, this.displayHeight);
+
         if (!this.isFinished()){
             this.move();
             this.frameUpdate();
         }
-        this.draw();
+        this.draw(); 
         this.check();
     }
 
@@ -75,10 +81,7 @@ export class Sprite3x3 implements  DrawObject  {
 
     private check(): void{
 
-        if (this.isStepFinished()){
-            this.coord.x = this.movePoints[this.index].x;
-            this.coord.y = this.movePoints[this.index].y;
-            this.draw();
+        if (this.isStepFinished() && this.movePoints.length) {
             this.index++;
         }
 
@@ -103,58 +106,65 @@ export class Sprite3x3 implements  DrawObject  {
 
     private move(): void{
 
-        let moveTo = this.movePoints[this.index];
-        //direction
-        if (moveTo){
-            if ((moveTo.x - this.coord.x) > 0){
+        let moveToNew = this.movePoints[this.index];
+        if (this.moveTo.x != moveToNew.x || this.moveTo.y != moveToNew.y ){
+            
+            if ((moveToNew.x - this.moveTo.x) > 0){
                 this.moveDirection = Direction.Right;
-            }else if ((moveTo.x - this.coord.x) < 0){
+                console.log("Direction.Right;");
+            }else if ((moveToNew.x - this.moveTo.x) < 0){
                 this.moveDirection = Direction.Left;
+                console.log("Direction.Left;");
             }
-            if ((moveTo.y - this.coord.y) > 0){
+            if ((moveToNew.y - this.moveTo.y) > 0){
                 this.moveDirection = Direction.Down;
-            } else if ((moveTo.y - this.coord.y) < 0){
+                console.log("Direction.Down;");
+            } else if ((moveToNew.y - this.moveTo.y) < 0){
                 this.moveDirection = Direction.Up;
+                console.log("Direction.Up;");
             }
 
-            //move
-            switch (this.moveDirection){
-                case Direction.Down:
-                    this.coord.y += this.speedY;
-                    break;
-                case Direction.Up:
-                    this.coord.y -= this.speedY;
-                    break;
-                case Direction.Left:
-                    this.coord.x -= this.speedX;
-                    break;
-                case Direction.Right:
-                    this.coord.x += this.speedX;
-                    break;
-            }
+            this.moveTo = moveToNew;
+      
+        }
+
+        //move
+        switch (this.moveDirection){
+            case Direction.Down:
+                this.coord.y += this.speedY;
+                break;
+            case Direction.Up:
+                this.coord.y -= this.speedY;
+                break;
+            case Direction.Left:
+                this.coord.x -= this.speedX;
+                break;
+            case Direction.Right:
+                this.coord.x += this.speedX;
+                break;
         }
     }
 
     private isStepFinished(): boolean{
 
         if (this.movePoints.length){
+            const yDiff = this.coord.y - this.moveTo.y;
+            const xDiff = this.coord.x - this.moveTo.x;
+
+            //TODO 
             switch (this.moveDirection){
                 case Direction.Down:
+                    return yDiff >= this.speedY;
                 case Direction.Up:
-                    if (Math.abs(this.coord.y - this.movePoints[this.index].y) > 2){
-                        return false;
-                    }else {
-                        return true;
-                    }
+                    return yDiff <= this.speedY;
                 case Direction.Left:
+                    return xDiff <= this.speedX;
                 case Direction.Right:
-                    if (Math.abs(this.coord.x - this.movePoints[this.index].x) > 2){
-                        return false;
-                    }else {
-                        return true;
-                    }
+                    return xDiff >= this.speedX;
             }
-        }
+        }else {
+            return true;
+        }  
     }
 
 
@@ -184,7 +194,5 @@ export class Sprite3x3 implements  DrawObject  {
                 this.frameHeightIndex = 2;
                 break;
         }
-
     };     
-
 }

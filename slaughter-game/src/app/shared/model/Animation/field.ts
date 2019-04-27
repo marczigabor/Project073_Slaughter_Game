@@ -43,6 +43,7 @@ export class Field implements  DrawObject  {
 
     
     private draw(): void{
+        //this.context.globalAlpha = 1;
         this.context.drawImage(
             this.image,
             0, 

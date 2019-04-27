@@ -1,63 +1,48 @@
 export class Canvas {
-    private _width: number;
-    private _height: number;
-    private _backgroundColor: string;
-    private _canvas: HTMLCanvasElement;
-    private _context:any; 
+    
+    canvas: HTMLCanvasElement;
+    context:CanvasRenderingContext2D; 
 
+    canvasBackground: HTMLCanvasElement;
+    contextBackground:CanvasRenderingContext2D; 
 
-    constructor(width: number, height: number, backgroundColor: string) {
-        this._height = height;
-        this._width = width;
-        this._backgroundColor = backgroundColor;
+    constructor(container: HTMLElement, backgroundColor: string) {
+
+        this.canvas = this.getCanvasNode(container.offsetWidth, container.offsetHeight, 'transparent');
+        this.canvasBackground = this.getCanvasNode(container.offsetWidth, container.offsetHeight, backgroundColor);
+
+        this.context = this.getContext(this.canvas);
+        this.contextBackground = this.getContext(this.canvasBackground);
+
+        container.appendChild(this.canvasBackground);
+        container.appendChild(this.canvas);
     }
 
-    createCanvasNode(): HTMLCanvasElement{
-        this._canvas = document.createElement("canvas");
-        this._context = this.canvas.getContext("2d");
-
-        this._canvas.width = this._width;
-        this._canvas.height = this._height;
-        this._canvas.style.backgroundColor = this._backgroundColor;
-
-        return this._canvas;
+    private getContext(canvas: HTMLCanvasElement): any {
+        return canvas.getContext("2d");
     }
 
-    displayGrid(blockSizeX: number, blockSizeY: number, blockNumberX: number, blockNumberY: number){
+    private getCanvasNode(width: number, height: number, color: string): HTMLCanvasElement{
+        
+        let canvas = document.createElement("canvas");
 
-        for (let i = 0; i < blockNumberX; i++ ) {
-            this._context.beginPath();
-            this._context.moveTo(i * blockSizeX , 0);
-            this._context.lineTo(i * blockSizeX, this._canvas.height);
-            this._context.stroke();
-        }
-        for (let i=0; i < blockNumberY; i++ ) {
-            this._context.beginPath();
-            this._context.moveTo(0,  i * blockSizeY);
-            this._context.lineTo(this._canvas.width, i * blockSizeX);
-            this._context.stroke();
-        }
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
 
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.backgroundColor = color;
+
+        return canvas;
     }
 
     get width(): number {
-        return this._width;
+        return this.canvas.offsetWidth;
     }
 
     get height(): number {
-        return this._height;
-    }
-    
-    get backgroundColor(): string {
-        return this._backgroundColor;
-    }
-
-    get canvas(): HTMLCanvasElement {
-        return this._canvas;
-    }
-
-    get context(): any {
-        return this._context;
+        return this.canvas.offsetHeight;
     }
     
 }

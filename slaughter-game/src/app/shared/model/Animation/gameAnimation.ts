@@ -13,37 +13,20 @@ export class GameAnimation {
     private context: any; 
     private objects: DrawObject[]; 
     private isObjectsMoving: boolean;
-
+    private init1: boolean = true;
 
     constructor (canvas: HTMLCanvasElement, context: any){
         this.objects = [];
         this.canvas = canvas;
         this.context = context;
     }
-    
-    // displayGrid(xBlocks: number, yBlocks: number){
-
-    //     for (let i = 0; i < xBlocks; i++ ) {
-    //         this.context.beginPath();
-    //         this.context.moveTo(i * (this.canvas.width / xBlocks) , 0);
-    //         this.context.lineTo(i * (this.canvas.width / xBlocks), this.canvas.height);
-    //         this.context.stroke();
-    //     }
-    //     for (let i=0; i<yBlocks; i++ ) {
-    //         this.context.beginPath();
-    //         this.context.moveTo(0,  i * (this.canvas.height / yBlocks));
-    //         this.context.lineTo(this.canvas.width, i * (this.canvas.height / yBlocks));
-    //         this.context.stroke();
-    //     }
-
-    // }
 
     addDrawObject(object: DrawObject){
 
         object.notificationSubject.subscribe(
             () => {
                 if (!this.isObjectsMoving){
-                    this.draw()
+                    this.requestAnimationFrame(this.draw);
                 }
             }
         );
@@ -51,7 +34,11 @@ export class GameAnimation {
         this.objects.push(object);
     }
 
-    private draw = ():void => {
+    public init(){
+        this.draw();
+    }
+
+    public draw = ():void => {
 
         this.isObjectsMoving = false;
 
@@ -61,12 +48,15 @@ export class GameAnimation {
 
         this.objects.forEach (object => {
 
-            object.update();
+            if (this.init1 || (object.speedX > 0 && object.speedY > 0)){
+                 object.update();
+            }
             if (!this.isObjectsMoving){
                 this.isObjectsMoving = !object.isFinished();
             }
         });  
-        
+        this.init1 = false;
+
         if (this.isObjectsMoving){
             this.raf = this.requestAnimationFrame(this.draw);
         } 
