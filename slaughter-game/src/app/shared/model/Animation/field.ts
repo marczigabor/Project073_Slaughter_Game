@@ -60,7 +60,7 @@ export class Field implements  DrawObject  {
         this.draw();
     }
     
-    moveArray(moveTo: Point[]): void {
+    setMove(moveTo: Point[]): void {
     }
 
     isFinished(): boolean {

@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 
 export interface DrawObject{
     update(): void;
-    moveArray(moveTo: Point[]): void;
+    setMove(moveTo: Point[]): void;
     isFinished(): boolean;
     getCoords(): Point;
     readonly speedX: number;

@@ -95,7 +95,7 @@ export class Game {
             .pipe(tap((event: MouseEvent) => {
 
                 let found: boolean = false;
-                let block: Point = this.getBlockByCoordinate(new Point(event.layerX, event.layerY));
+                let blockClicked: Point = this.getBlockByCoordinate(new Point(event.layerX, event.layerY));
 
                 // this._objects.forEach (item=> {
                 //     const point = item.getCoords();
@@ -108,20 +108,27 @@ export class Game {
 
                 //console.log(event);
 
+                //TODO move it to move handler object
                 if (!found){
                     this._objects.forEach(element => {
 
                         if (element.speedX != 0 && element.speedY != 0 ){
                             let charPoints = element.getCoords();
-                            let routes = this._map.getRoute(this.getBlockByCoordinate(charPoints), block);
+                            let charPointsBlock = this.getBlockByCoordinate(charPoints);
+
+                            let routes = this._map.getRoute(charPointsBlock, blockClicked);
                             console.log(routes);
-            
-                            let arrayPoints: Point[] = [];
-                            routes.forEach(element => {
-                                arrayPoints.push(this.getCoordinateByBlock(element));
-                            });
-            
-                            element.moveArray(arrayPoints);
+    
+                            if (routes.length > 0){
+                
+                                let arrayPoints: Point[] = [];
+                                arrayPoints.push(this.getCoordinateByBlock(charPointsBlock));
+                                routes.forEach(element => {
+                                    arrayPoints.push(this.getCoordinateByBlock(element));
+                                });
+                
+                                element.setMove(arrayPoints);
+                            }
                         }
                     });
                 }

@@ -56,7 +56,7 @@ export class Sprite3x3 implements  DrawObject  {
         return this.coord;
     }
 
-    moveArray(moveTo: Point[]): void {
+    setMove(moveTo: Point[]): void {
         this.index = 0;
         this.movePoints = moveTo;
         
@@ -151,7 +151,6 @@ export class Sprite3x3 implements  DrawObject  {
             const yDiff = this.coord.y - this.moveTo.y;
             const xDiff = this.coord.x - this.moveTo.x;
 
-            //TODO 
             switch (this.moveDirection){
                 case Direction.Down:
                     return yDiff >= this.speedY;
