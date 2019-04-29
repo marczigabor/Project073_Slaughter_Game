@@ -1,5 +1,5 @@
 import { Graph, astar } from 'javascript-astar';
-import { Point } from "./point";
+import { Point } from "../model/point";
 
 export class Map {
 

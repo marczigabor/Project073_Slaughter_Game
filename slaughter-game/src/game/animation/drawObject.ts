@@ -1,4 +1,4 @@
-import { Point } from "../point";
+import { Point } from "../model/point";
 import { Subject } from "rxjs";
 
 export interface DrawObject{

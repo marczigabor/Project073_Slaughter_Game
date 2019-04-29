@@ -1,5 +1,5 @@
-import { Direction } from "../direction";
-import { Point } from "../point";
+import { Direction } from "../model/direction";
+import { Point } from "../model/point";
 import { Subject } from "rxjs";
 import { DrawObjectOptions } from "./drawObjectOptions";
 import { DrawObject } from "./drawObject";

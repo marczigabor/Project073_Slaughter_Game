@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { DrawObjectOptions } from '../model/Animation/drawObjectOptions';
-import { DrawObject } from '../model/Animation/drawObject';
-import { Field } from '../model/Animation/field';
+import { DrawObjectOptions } from '../animation/drawObjectOptions';
+import { DrawObject } from '../animation/drawObject';
+import { Field } from '../animation/field';
 import { ImageLoaderService } from './image-loader.service';
-import { Map } from "../model/map";
-import { Sprite3x3 } from '../model/Animation/sprite3x3';
+import { Map } from "../core/map";
+import { Sprite3x3 } from '../animation/sprite3x3';
 import { Point } from '../model/point';
 
 @Injectable({

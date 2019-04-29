@@ -1,4 +1,4 @@
-import { Point } from "../point";
+import { Point } from "../model/point";
 
 export interface DrawObjectOptions{
     image: HTMLImageElement;

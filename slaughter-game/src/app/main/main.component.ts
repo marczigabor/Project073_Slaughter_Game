@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Game } from '../shared/model/game';
-import { Canvas } from '../shared/model/canvas';
+import { Game } from '../../game/core/game';
 
 @Component({
   selector: 'app-main',

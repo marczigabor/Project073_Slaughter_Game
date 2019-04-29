@@ -1,7 +1,7 @@
+import { DrawObjectOptions } from "./drawObjectOptions";
 import { DrawObject } from "./drawObject";
 import { Subject } from "rxjs";
-import { Point } from "../point";
-import { DrawObjectOptions } from "./drawObjectOptions";
+import { Point } from "../model/point";
 
 
 export class Field implements  DrawObject  {
