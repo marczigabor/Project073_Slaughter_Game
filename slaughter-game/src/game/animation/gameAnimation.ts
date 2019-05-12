@@ -23,7 +23,7 @@ export class GameAnimation {
 
     addDrawObject(object: DrawObject){
 
-        object.notificationSubject.subscribe(
+        object.setMoveSubject.subscribe(
             () => {
                 if (!this.isObjectsMoving){
                     this.requestAnimationFrame(this.draw);

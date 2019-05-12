@@ -1,6 +1,4 @@
 import { Canvas } from './canvas';
-import { fromEvent } from 'rxjs'
-import { tap } from 'rxjs/operators'
 import { Point } from '../model/point';
 import { Map } from './map';
 import { GameAnimation } from '../animation/gameAnimation';
@@ -17,6 +15,7 @@ export class Game {
     private _objects: DrawObject[];
     private _drawObjectFactory: ObjectCreatorService;
     private _inputHandler: InputHandler;
+    private canStart: boolean;
 
     constructor(
         widthBlockNumber: number, 
@@ -32,13 +31,12 @@ export class Game {
             this._animation = new GameAnimation(this._canvas.canvas, this._canvas.context);
             this._drawObjectFactory = new ObjectCreatorService(new ImageLoaderService());
             this._inputHandler = new InputHandler(this._canvas.canvas);
-            this._inputHandler.init().subscribe((event: MouseEvent)=> this.handleInput(new Point(event.layerX, event.layerY)));
-
-            this.loadDrawObjects();
-
+            this._inputHandler.init().subscribe((event: MouseEvent) => this.handleInput(new Point(event.layerX, event.layerY)));
+            this.loadDrawObjects().then(() => {
+                this._animation.init();
+            });
             console.log( this._map.grid);
     }
-
 
     private handleInput(inputPoint: Point){
 
@@ -55,65 +53,67 @@ export class Game {
         // });    
 
         //console.log(event);
-
         //TODO move it to move handler object
         if (!found){
-            this._objects.forEach(element => {
+            var character = this._objects.find((element)=> element.name == 'captainamerica_shield.png');
+            if (character) {
+                let charPoints = character.getCoords();
+                let charPointsBlock = this.getBlockByCoordinate(charPoints);
 
-                if (element.speedX != 0 && element.speedY != 0 ){
-                    let charPoints = element.getCoords();
-                    let charPointsBlock = this.getBlockByCoordinate(charPoints);
+                let routes = this._map.getRoute(charPointsBlock, blockClicked);
+                console.log(routes);
 
-                    let routes = this._map.getRoute(charPointsBlock, blockClicked);
-                    console.log(routes);
-
-                    if (routes.length > 0){
-        
-                        let arrayPoints: Point[] = [];
-                        arrayPoints.push(this.getCoordinateByBlock(charPointsBlock));
-                        routes.forEach(element => {
-                            arrayPoints.push(this.getCoordinateByBlock(element));
-                        });
-        
-                        element.setMove(arrayPoints);
-                    }
+                if (routes.length > 0){
+    
+                    let arrayPoints: Point[] = [];
+                    arrayPoints.push(this.getCoordinateByBlock(charPointsBlock));
+                    routes.forEach(element => {
+                        arrayPoints.push(this.getCoordinateByBlock(element));
+                    });
+    
+                    character.setMove(arrayPoints);
                 }
-            });
+            }
+        }
+
+
+        var enemy = this._objects.find((element)=> element.name == 'yuffiekisaragi.png');
+        if (enemy){
+
         }
     }
 
-    private loadDrawObjects(): void{
-        var that = this;
-        //fields
-        this._drawObjectFactory.getFields(
+    private loadDrawObjects(): Promise<void>{
+        return this._drawObjectFactory.getFields(
             this._map, 
             this._canvas.contextBackground, 
             new Point(this.blockSizeX, this.blockSizeY) ).then((items: DrawObject[]) => {
             
             items.forEach(item => {
-                that._objects.push(item);
-                that._animation.addDrawObject(item);
+                this._objects.push(item);
+                this._animation.addDrawObject(item);
             });
-
-           return 0;
-
         }).then(() => {
-            that._drawObjectFactory.getCharacters(
+            this._drawObjectFactory.getCharacter(
+                    0,
                     this._canvas.context,
                     new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
                     new Point(this.blockSizeX, this.blockSizeY)
-                ).then((items: DrawObject[])=> {
-
-                items.forEach ((item) =>{
-                    that._objects.push(item);
+                ).then((item: DrawObject)=> {
+                    this._objects.push(item);
                     this._animation.addDrawObject(item);
                 });
+        }).then(()=> {
+                this._drawObjectFactory.getCharacter(
+                    1,
+                    this._canvas.context,
+                    new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
+                    new Point(this.blockSizeX, this.blockSizeY)
+                ).then((item: DrawObject)=> {
+                    this._objects.push(item);
+                    this._animation.addDrawObject(item);
             });
-            return 0;
-
-        }).then(() => {
-            that._animation.init();
-        });           
+        });
     }
 
     get blockSizeX(){
@@ -123,11 +123,6 @@ export class Game {
     get blockSizeY(){
         return this._canvas.height / this._map.height;
     }
-
-    display(): void {
-
-    }
-
 
     private getBlockByCoordinate(point: Point): Point {
         return new Point(Math.floor( point.x / this.blockSizeX), Math.floor (point.y / this.blockSizeY));

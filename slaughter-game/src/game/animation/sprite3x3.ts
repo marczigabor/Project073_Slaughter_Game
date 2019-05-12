@@ -19,7 +19,7 @@ export class Sprite3x3 implements  DrawObject  {
     speedX: number;
     speedY: number;
     moveDirection: Direction;
-    notificationSubject: Subject<any>;
+    setMoveSubject: Subject<any>;
     name: string;
     moveTo: Point;
 
@@ -49,7 +49,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.index = 0;
         this.moveTo
 
-        this.notificationSubject = new Subject();
+        this.setMoveSubject = new Subject();
     }
 
     getCoords(): Point{
@@ -60,7 +60,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.index = 0;
         this.movePoints = moveTo;
         
-        this.notificationSubject.next();
+        this.setMoveSubject.next(this.name);
     }
 
     update(){

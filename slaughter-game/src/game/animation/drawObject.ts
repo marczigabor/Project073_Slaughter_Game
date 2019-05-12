@@ -8,7 +8,7 @@ export interface DrawObject{
     getCoords(): Point;
     readonly speedX: number;
     readonly speedY: number;
-    readonly notificationSubject: Subject<any>;
+    readonly setMoveSubject: Subject<any>;
     readonly name: string;
 }
 

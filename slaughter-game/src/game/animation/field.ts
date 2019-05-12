@@ -6,7 +6,7 @@ import { Point } from "../model/point";
 
 export class Field implements  DrawObject  {
     
-    notificationSubject: Subject<any>;
+    setMoveSubject: Subject<any>;
     context: any;
     displayWidth: number;
     displayHeight: number;
@@ -38,7 +38,7 @@ export class Field implements  DrawObject  {
         this.tickCount = 0;
         this.ticksPerFrame = 10; 
 
-        this.notificationSubject = new Subject();
+        this.setMoveSubject = new Subject();
     }
 
     

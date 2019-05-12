@@ -98,7 +98,7 @@ private characterSelctor(num: number): string{
 getCharacters(context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<DrawObject[]>{
 
   let promises: Promise<DrawObject>[] = [];
-  for (let i=0; i<6; i++){
+  for (let i=0; i<2; i++){
     promises.push(this.getCharacter(i, context, startCoord, blockSize));
   }
 
