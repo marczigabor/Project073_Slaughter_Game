@@ -1,21 +1,23 @@
 import { Canvas } from './canvas';
 import { Point } from '../model/point';
-import { Map } from './map';
+import { ArrayGenerator } from '../service/array-generator.service';
 import { GameAnimation } from '../animation/gameAnimation';
 import { DrawObject } from '../animation/drawObject';
 import { ObjectCreatorService } from '../service/object-creator.service';
 import { ImageLoaderService } from '../service/image-loader.service';
 import { InputHandler } from './inputHandler';
+import { MoveObject } from '../animation/moveObject';
+import { RandomNumberService } from '../service/random-number.service';
+import { MapService } from '../service/map-service.service';
 
 export class Game {
 
     private _canvas: Canvas;
-    private _map: Map;
+    private _map: MapService;
     private _animation: GameAnimation;
-    private _objects: DrawObject[];
+    private _objects: MoveObject[];
     private _drawObjectFactory: ObjectCreatorService;
     private _inputHandler: InputHandler;
-    private canStart: boolean;
 
     constructor(
         widthBlockNumber: number, 
@@ -25,7 +27,7 @@ export class Game {
         ) {
 
             this._objects = [];
-            this._map = new Map(widthBlockNumber, heightBlockNumber);
+            this._map = new MapService(ArrayGenerator.generateMapArray(widthBlockNumber, heightBlockNumber, 25, new RandomNumberService()));
             let containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(containerNode, backgroundColor);
             this._animation = new GameAnimation(this._canvas.canvas, this._canvas.context);
@@ -55,7 +57,7 @@ export class Game {
         //console.log(event);
         //TODO move it to move handler object
         if (!found){
-            var character = this._objects.find((element)=> element.name == 'captainamerica_shield.png');
+            var character = this._objects.find((element)=> element.name == 'captainamerica_shield');
             if (character) {
                 let charPoints = character.getCoords();
                 let charPointsBlock = this.getBlockByCoordinate(charPoints);
@@ -77,8 +79,10 @@ export class Game {
         }
 
 
-        var enemy = this._objects.find((element)=> element.name == 'yuffiekisaragi.png');
+        var enemy = this._objects.find((element)=> element.name == 'yuffiekisaragi');
         if (enemy){
+
+            
 
         }
     }
@@ -88,9 +92,8 @@ export class Game {
             this._map, 
             this._canvas.contextBackground, 
             new Point(this.blockSizeX, this.blockSizeY) ).then((items: DrawObject[]) => {
-            
             items.forEach(item => {
-                this._objects.push(item);
+            //     this._objects.push(item);
                 this._animation.addDrawObject(item);
             });
         }).then(() => {
@@ -99,7 +102,7 @@ export class Game {
                     this._canvas.context,
                     new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
                     new Point(this.blockSizeX, this.blockSizeY)
-                ).then((item: DrawObject)=> {
+                ).then((item: MoveObject)=> {
                     this._objects.push(item);
                     this._animation.addDrawObject(item);
                 });
@@ -109,7 +112,7 @@ export class Game {
                     this._canvas.context,
                     new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
                     new Point(this.blockSizeX, this.blockSizeY)
-                ).then((item: DrawObject)=> {
+                ).then((item: MoveObject)=> {
                     this._objects.push(item);
                     this._animation.addDrawObject(item);
             });

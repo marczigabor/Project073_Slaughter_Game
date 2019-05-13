@@ -2,9 +2,9 @@ import { Direction } from "../model/direction";
 import { Point } from "../model/point";
 import { Subject } from "rxjs";
 import { DrawObjectOptions } from "./drawObjectOptions";
-import { DrawObject } from "./drawObject";
+import { MoveObject } from "./moveObject";
 
-export class Sprite3x3 implements  DrawObject  {
+export class Sprite3x3 implements  MoveObject  {
 
     context: any;
     displayWidth: number;
@@ -22,8 +22,8 @@ export class Sprite3x3 implements  DrawObject  {
     setMoveSubject: Subject<any>;
     name: string;
     moveTo: Point;
-
     coord: Point;
+    isMoveObject: boolean;
 
     private movePoints: Point[];
     private index: number = 0;
@@ -40,6 +40,7 @@ export class Sprite3x3 implements  DrawObject  {
         this.coord = options.coord;
         this.moveTo = this.coord;
         this.name = options.name;
+        this.isMoveObject = true;
 
         this.frameRowIndex = 0;
         this.frameHeightIndex = 0;
@@ -47,7 +48,6 @@ export class Sprite3x3 implements  DrawObject  {
         this.ticksPerFrame = 7; 
         this.movePoints = [];
         this.index = 0;
-        this.moveTo
 
         this.setMoveSubject = new Subject();
     }

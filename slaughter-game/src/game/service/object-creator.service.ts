@@ -1,20 +1,17 @@
-import { Injectable } from '@angular/core';
 import { DrawObjectOptions } from '../animation/drawObjectOptions';
 import { DrawObject } from '../animation/drawObject';
 import { Field } from '../animation/field';
 import { ImageLoaderService } from './image-loader.service';
-import { Map } from "../core/map";
 import { Sprite3x3 } from '../animation/sprite3x3';
 import { Point } from '../model/point';
+import { MoveObject } from '../animation/moveObject';
+import { MapService } from './map-service.service';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class ObjectCreatorService {
 
   constructor(private imageLoaderService: ImageLoaderService) { }
 
-  getFields(map: Map, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
+  getFields(map: MapService, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
 
     let imageGrass: HTMLImageElement;
     let imageRock: HTMLImageElement;
@@ -109,7 +106,7 @@ getCharacters(context: CanvasRenderingContext2D, startCoord: Point, blockSize: P
   }); 
 }
 
-getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<DrawObject>{
+getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<MoveObject>{
 
     return new Promise((resolve)=> {
 
@@ -134,7 +131,7 @@ getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, 
                 x: startCoord.x,
                 y: startCoord.y
             },
-            name: image.src.split('/')[6]
+            name: image.src.split('/')[6].split('.')[0]
         }
 
         const character = new Sprite3x3(options);

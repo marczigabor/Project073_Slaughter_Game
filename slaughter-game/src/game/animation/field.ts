@@ -4,23 +4,16 @@ import { Subject } from "rxjs";
 import { Point } from "../model/point";
 
 
-export class Field implements  DrawObject  {
+export class Field implements DrawObject  {
     
     setMoveSubject: Subject<any>;
     context: any;
     displayWidth: number;
     displayHeight: number;
     image: HTMLImageElement;
-    ticksPerFrame: number; //fps
-    tickCount: number;
-    frameRowIndex: number;
-    frameHeightIndex: number;
     frameWidth: number;
     frameHeight: number;
-    speedX: number;
-    speedY: number;
     coord: Point;
-    name: string;
 
     constructor(options: DrawObjectOptions){
         this.image = options.image;
@@ -29,16 +22,7 @@ export class Field implements  DrawObject  {
         this.context = options.context;
         this.frameWidth = options.frameWidth;
         this.frameHeight = options.frameHeight;
-        this.speedX = options.speedX;
-        this.speedY = options.speedY;
         this.coord = options.coord;
-
-        this.frameRowIndex = 0;
-        this.frameHeightIndex = 0;
-        this.tickCount = 0;
-        this.ticksPerFrame = 10; 
-
-        this.setMoveSubject = new Subject();
     }
 
     
@@ -60,13 +44,6 @@ export class Field implements  DrawObject  {
         this.draw();
     }
     
-    setMove(moveTo: Point[]): void {
-    }
-
-    isFinished(): boolean {
-        return true;
-    }
-
     getCoords(): Point {
         return this. coord;
     }

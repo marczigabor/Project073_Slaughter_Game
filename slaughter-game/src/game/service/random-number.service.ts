@@ -1,9 +1,6 @@
-import { Injectable } from '@angular/core';
+import { IRandomNumberService } from "./iRandom-number.service";
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RandomNumberService {
+export class RandomNumberService implements IRandomNumberService {
 
   constructor() { }
 

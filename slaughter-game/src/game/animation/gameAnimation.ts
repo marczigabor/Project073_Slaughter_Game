@@ -1,4 +1,5 @@
 import { DrawObject } from "./drawObject";
+import { MoveObject } from "./moveObject";
 
 export class GameAnimation {
 
@@ -11,31 +12,44 @@ export class GameAnimation {
     private raf: number;
     private canvas: HTMLCanvasElement;
     private context: any; 
-    private objects: DrawObject[]; 
+    private moveObjects: MoveObject[]; 
+    private backGroundObjects :DrawObject[]; 
     private isObjectsMoving: boolean;
-    private init1: boolean = true;
 
     constructor (canvas: HTMLCanvasElement, context: any){
-        this.objects = [];
+        this.moveObjects = [];
+        this.backGroundObjects = [];
         this.canvas = canvas;
         this.context = context;
     }
 
     addDrawObject(object: DrawObject){
 
-        object.setMoveSubject.subscribe(
-            () => {
-                if (!this.isObjectsMoving){
-                    this.requestAnimationFrame(this.draw);
-                }
-            }
-        );
+        const moveObject = object as MoveObject;
 
-        this.objects.push(object);
+        if (moveObject.isMoveObject){
+            moveObject.setMoveSubject.subscribe(
+                () => {
+                    if (!this.isObjectsMoving){
+                        this.requestAnimationFrame(this.draw);
+                    }
+                }
+            )
+            this.moveObjects.push(moveObject);
+        }else {
+            this.backGroundObjects.push(object);
+        }  
     }
 
     public init(){
+        this.drawBackGround();
         this.draw();
+    }
+
+    public drawBackGround = ():void => {
+        this.backGroundObjects.forEach(element => {
+            element.update();
+        });
     }
 
     public draw = ():void => {
@@ -46,16 +60,13 @@ export class GameAnimation {
 
         this.context.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
 
-        this.objects.forEach (object => {
+        this.moveObjects.forEach(object => {
 
-            if (this.init1 || (object.speedX > 0 && object.speedY > 0)){
-                 object.update();
-            }
+            object.update();
             if (!this.isObjectsMoving){
                 this.isObjectsMoving = !object.isFinished();
             }
         });  
-        this.init1 = false;
 
         if (this.isObjectsMoving){
             this.raf = this.requestAnimationFrame(this.draw);
