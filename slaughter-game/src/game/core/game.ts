@@ -1,6 +1,6 @@
 import { Canvas } from './canvas';
 import { Point } from '../model/point';
-import { ArrayGenerator } from '../service/array-generator.service';
+import { MapGenerator } from '../service/map-generator.service';
 import { GameAnimation } from '../animation/gameAnimation';
 import { DrawObject } from '../animation/drawObject';
 import { ObjectCreatorService } from '../service/object-creator.service';
@@ -8,12 +8,12 @@ import { ImageLoaderService } from '../service/image-loader.service';
 import { InputHandler } from './inputHandler';
 import { MoveObject } from '../animation/moveObject';
 import { RandomNumberService } from '../service/random-number.service';
-import { MapService } from '../service/map-service.service';
+import { AStarRoutingService } from '../service/astar-routing.service';
 
 export class Game {
 
     private _canvas: Canvas;
-    private _map: MapService;
+    private _map: AStarRoutingService;
     private _animation: GameAnimation;
     private _objects: MoveObject[];
     private _drawObjectFactory: ObjectCreatorService;
@@ -27,7 +27,7 @@ export class Game {
         ) {
 
             this._objects = [];
-            this._map = new MapService(ArrayGenerator.generateMapArray(widthBlockNumber, heightBlockNumber, 25, new RandomNumberService()));
+            this._map = new AStarRoutingService(MapGenerator.generateMapArray(widthBlockNumber, heightBlockNumber, 25, new RandomNumberService()));
             let containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(containerNode, backgroundColor);
             this._animation = new GameAnimation(this._canvas.canvas, this._canvas.context);

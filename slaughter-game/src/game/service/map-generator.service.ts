@@ -1,6 +1,6 @@
 import { IRandomNumberService } from "./iRandom-number.service";
 
-export class ArrayGenerator {
+export class MapGenerator {
 
     static generateMapArray = (x: number, y: number, wallPercent: number, randomNumberService: IRandomNumberService): number[][] => {
         let array: number[][] = [];
@@ -8,7 +8,7 @@ export class ArrayGenerator {
 
         for (let i=0; i < x; i++){
 
-             array[i] = Array.from(Array(y), () => ArrayGenerator.getblockValue(wallPercent, randomNumberService));
+             array[i] = Array.from(Array(y), () => MapGenerator.getblockValue(wallPercent, randomNumberService));
         }
 
         return array;

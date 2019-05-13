@@ -5,13 +5,13 @@ import { ImageLoaderService } from './image-loader.service';
 import { Sprite3x3 } from '../animation/sprite3x3';
 import { Point } from '../model/point';
 import { MoveObject } from '../animation/moveObject';
-import { MapService } from './map-service.service';
+import { AStarRoutingService } from './astar-routing.service';
 
 export class ObjectCreatorService {
 
   constructor(private imageLoaderService: ImageLoaderService) { }
 
-  getFields(map: MapService, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
+  getFields(map: AStarRoutingService, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
 
     let imageGrass: HTMLImageElement;
     let imageRock: HTMLImageElement;
