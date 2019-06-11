@@ -20,10 +20,12 @@ export class Sprite3x3 implements  MoveObject  {
     speedY: number;
     moveDirection: Direction;
     setMoveSubject: Subject<any>;
+    endStepSubject : Subject<any>;
     name: string;
     moveTo: Point;
     coord: Point;
     isMoveObject: boolean;
+    id: number;
 
     private movePoints: Point[];
     private index: number = 0;
@@ -41,6 +43,7 @@ export class Sprite3x3 implements  MoveObject  {
         this.moveTo = this.coord;
         this.name = options.name;
         this.isMoveObject = true;
+        this.id = options.id;
 
         this.frameRowIndex = 0;
         this.frameHeightIndex = 0;
@@ -50,6 +53,7 @@ export class Sprite3x3 implements  MoveObject  {
         this.index = 0;
 
         this.setMoveSubject = new Subject();
+        this.endStepSubject = new Subject();
     }
 
     getCoords(): Point{
@@ -59,6 +63,7 @@ export class Sprite3x3 implements  MoveObject  {
     setMove(moveTo: Point[]): void {
         this.index = 0;
         this.movePoints = moveTo;
+        
         
         this.setMoveSubject.next(this.name);
     }
@@ -70,7 +75,7 @@ export class Sprite3x3 implements  MoveObject  {
         if (!this.isFinished()){
             this.move();
             this.frameUpdate();
-        }
+        }  
         this.draw(); 
         this.check();
     }
@@ -82,6 +87,7 @@ export class Sprite3x3 implements  MoveObject  {
     private check(): void{
 
         if (this.isStepFinished() && this.movePoints.length) {
+            this.endStepSubject.next(this.id);
             this.index++;
         }
 
@@ -161,7 +167,9 @@ export class Sprite3x3 implements  MoveObject  {
                 case Direction.Right:
                     return xDiff >= this.speedX;
             }
+            return false;
         }else {
+            console.log("finished");
             return true;
         }  
     }

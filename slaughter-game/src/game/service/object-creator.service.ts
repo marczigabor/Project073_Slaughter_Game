@@ -5,13 +5,13 @@ import { ImageLoaderService } from './image-loader.service';
 import { Sprite3x3 } from '../animation/sprite3x3';
 import { Point } from '../model/point';
 import { MoveObject } from '../animation/moveObject';
-import { AStarRoutingService } from './astar-routing.service';
+import { GridService } from './grid.service';
 
 export class ObjectCreatorService {
 
   constructor(private imageLoaderService: ImageLoaderService) { }
 
-  getFields(map: AStarRoutingService, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
+  getFields(map: GridService, contextBackground: CanvasRenderingContext2D, displaySize: Point): Promise<DrawObject[]>{
 
     let imageGrass: HTMLImageElement;
     let imageRock: HTMLImageElement;
@@ -33,10 +33,10 @@ export class ObjectCreatorService {
         {
             for (let j=0; j<map.height; j++)
             {
-                fields.push(new Field(that.getOptions(contextBackground, imageGrass, i, j, displaySize)));
+                fields.push(new Field(that.getOptions(contextBackground, imageGrass, i, j, displaySize, 0)));
 
                 if(map.getValueOfBlock(i, j) == 0){
-                    fields.push(new Field(that.getOptions(contextBackground, imageRock, i, j, displaySize)));
+                    fields.push(new Field(that.getOptions(contextBackground, imageRock, i, j, displaySize, 0)));
                 }
             }
         }
@@ -45,7 +45,7 @@ export class ObjectCreatorService {
   });
 }
 
-private getOptions(context: CanvasRenderingContext2D, image: HTMLImageElement, i: number, j: number, displaySize: Point): DrawObjectOptions{
+private getOptions(context: CanvasRenderingContext2D, image: HTMLImageElement, i: number, j: number, displaySize: Point, id: number): DrawObjectOptions{
 
     const options: DrawObjectOptions = {
         context: context,
@@ -56,6 +56,7 @@ private getOptions(context: CanvasRenderingContext2D, image: HTMLImageElement, i
         image: image,
         speedX: 0,
         speedY: 0,
+        id: id,
         coord:{
             x: displaySize.x * i,
             y: displaySize.y * j
@@ -69,22 +70,22 @@ private characterSelctor(num: number): string{
 
   var path: string = '';
   switch (num){
-      case 0:
+      case 1:
           path = "assets/image/characters/yuffiekisaragi.png";    
           break;
-      case 1:
+      case 2:
           path =  "assets/image/characters/captainamerica_shield.png";    
           break;
-      case 2:
+      case 3:
           path  = "assets/image/characters/elphaba3.png";    
           break;
-      case 3:
+      case 4:
           path = "assets/image/characters/england.png";    
           break;
-      case 4:
+      case 5:
           path = "assets/image/characters/pirate_m2.png";    
           break;
-      case 5:
+      case 6:
           path = "assets/image/characters/china.png";    
           break;
   }
@@ -117,7 +118,7 @@ getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, 
 
         let displaySize = new Point(originalSize.x * multiplier, originalSize.y * multiplier);
 
-        const speed = (Math.random() * 3) + 1;
+        const speed = 3; // (Math.random() * 3) + 1;
         const options: DrawObjectOptions = {
             context: context,
             frameHeight: 48,
@@ -127,6 +128,7 @@ getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, 
             image: image,
             speedX: speed,
             speedY: speed,
+            id: num,
             coord:{
                 x: startCoord.x,
                 y: startCoord.y

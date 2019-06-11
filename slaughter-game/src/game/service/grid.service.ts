@@ -1,9 +1,8 @@
 import { Graph, astar } from 'javascript-astar';
 import { Point } from '../model/point';
 
-//TODO renme it to routing service
 //create another service for the objects (characters, bombs, slow down packs, etc) 
-export class AStarRoutingService {
+export class GridService {
 
   private _graph: Graph; //0: wall 
 
@@ -39,6 +38,5 @@ export class AStarRoutingService {
 
   get height(): number{
     return this._graph.grid[0].length;
-
   }
 }

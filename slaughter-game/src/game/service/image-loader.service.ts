@@ -13,7 +13,7 @@ export class ImageLoaderService {
       }
   
       image.onerror = (ev: Event) =>{
-        throw 'iamge not loaded: ' + url;
+        throw 'image not loaded: ' + url;
       }
     });
   }

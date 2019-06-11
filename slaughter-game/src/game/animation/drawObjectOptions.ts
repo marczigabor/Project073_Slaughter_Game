@@ -11,4 +11,5 @@ export interface DrawObjectOptions{
     speedY: number;
     coord: Point;
     name?: string;
+    id: number;
 }
