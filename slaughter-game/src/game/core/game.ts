@@ -2,24 +2,27 @@ import { Canvas } from './canvas';
 import { Point } from '../model/point';
 import { MapGenerator } from '../service/map-generator.service';
 import { GameAnimation } from '../animation/gameAnimation';
-import { DrawObject } from '../animation/drawObject';
 import { ObjectCreatorService } from '../service/object-creator.service';
 import { ImageLoaderService } from '../service/image-loader.service';
 import { InputHandler } from './inputHandler';
-import { MoveObject } from '../animation/moveObject';
 import { RandomNumberService } from '../service/random-number.service';
 import { GridService } from '../service/grid.service';
+import { MoveObject } from '../animation/moveObject';
+import { DrawObject } from '../animation/drawObject';
 import { CharacterService } from '../service/character.service';
 
 export class Game {
 
+
+    private playerId = 1;
+    private enemyId = 2;
+
     private _canvas: Canvas;
     private _gridService: GridService;
-    private _characterService: CharacterService;
     private _animation: GameAnimation;
-    private _objects: MoveObject[];
     private _drawObjectFactory: ObjectCreatorService;
     private _inputHandler: InputHandler;
+    private _characterService: CharacterService;
 
     constructor(
         widthBlockNumber: number, 
@@ -28,109 +31,121 @@ export class Game {
         backgroundColor?: string
         ) {
 
-            this._objects = [];
+            this._drawObjectFactory = new ObjectCreatorService(new ImageLoaderService());
             this._gridService = new GridService(MapGenerator.generateMapArray(widthBlockNumber, heightBlockNumber, 25, new RandomNumberService()));
-            //this._characterService = new CharacterService();
+            this._characterService = new CharacterService();
             let containerNode = document.getElementById(containerId);
             this._canvas = new Canvas(containerNode, backgroundColor);
             this._animation = new GameAnimation(this._canvas.canvas, this._canvas.context ); //, this._objects);
-            this._drawObjectFactory = new ObjectCreatorService(new ImageLoaderService());
             this._inputHandler = new InputHandler(this._canvas.canvas);
             this._inputHandler.init().subscribe((event: MouseEvent) => this.handleInput(new Point(event.layerX, event.layerY)));
-            this.loadDrawObjects().then(() => {
-                this._animation.init();
 
+            this.loadField()
+            .then(()=>{
+                return this.loadDrawObjects(this.playerId).then((item)=>{
 
+                    item.endStepSubject.subscribe((id: number)=>{
+                        //todo add this step to enemys
+
+                        //player choords
+                        let toUIPoint = item.getCoords();
+
+                        //get all enemies
+                        this._characterService.GetAll(this.enemyId).forEach((enemy)=>{
+
+                            //set new move points
+                            //move where the player is
+                            let arrayPoints = this.getUIRouteCoordinatesFromUICoords(enemy.UIObject.getCoords(), toUIPoint);
+                            if (arrayPoints.length > 0){
+                                enemy.UIObject.setMove(arrayPoints);
+                            }  
+            
+                        });
+
+                    });
+                    this._characterService.Add(item);
+                    this._animation.addDrawObject(item);
+                });
+            }).then((i)=>{
+                return this._animation.init();
             });
+
+            //load enemy
+            this.loadEnemy(this.enemyId, 3000, 3, 1);
+
             console.log( this._gridService.grid);
     }
 
-    private handleInput(inputPoint: Point){
+    private loadEnemy(id: number, timeOut: number, maxNum: number, current: number){
+        setTimeout(() => {
+            this.loadDrawObjects(2).then((item)=>{
+                this._characterService.Add(item);
+                this._animation.addDrawObject(item);
 
-        let found: boolean = false;
-        let blockClicked: Point = this.getBlockByCoordinate(inputPoint);
-
-        // this._objects.forEach (item=> {
-        //     const point = item.getCoords();
-        //     const charBlock = this.getBlockByCoordinate(point);
-        //     if (item.speedX != 0 && item.speedY != 0 && charBlock.x == block.x && charBlock.y == block.y){
-        //         console.log(item.name);
-        //         found = true;
-        //     }
-        // });    
-
-        //console.log(event);
-        //TODO move it to move handler object
-        if (!found){
-            var character = this._objects.find((element)=> element.name == 'captainamerica_shield');
-            if (character) {
-                let charPoints = character.getCoords();
-                let charPointsBlock = this.getBlockByCoordinate(charPoints);
-
-                let routes = this._gridService.getRoute(charPointsBlock, blockClicked);
-                console.log(routes);
-
-                if (routes.length > 0){
-    
-                    let arrayPoints: Point[] = [];
-                    arrayPoints.push(this.getCoordinateByBlock(charPointsBlock));
-                    routes.forEach(element => {
-                        arrayPoints.push(this.getCoordinateByBlock(element));
-                    });
-    
-                    character.setMove(arrayPoints);
+                //load next until we reach the max number
+                if (maxNum > current)  {
+                    this.loadEnemy(id, timeOut, maxNum, ++current);
                 }
-            }
-        }
-
-
-        var enemy = this._objects.find((element)=> element.name == 'yuffiekisaragi');
-        if (enemy){
-
-            
-            
-
-        }
+            });
+        }, timeOut);
     }
 
-    private loadDrawObjects(): Promise<void>{
+    private loadField(): Promise<void>{
 
         return this._drawObjectFactory.getFields(
-            this._gridService, 
-            this._canvas.contextBackground, 
-            new Point(this.blockSizeX, this.blockSizeY) ).then((items: DrawObject[]) => {
-            items.forEach(item => {
-            //     this._objects.push(item);
-                this._animation.addDrawObject(item);
-            });
-        }).then(() => {
-            this._drawObjectFactory.getCharacter(
-                    1,
-                    this._canvas.context,
-                    new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
-                    new Point(this.blockSizeX, this.blockSizeY)
-                ).then((item: MoveObject)=> {
-                    this._objects.push(item);
+                this._gridService, 
+                this._canvas.contextBackground, 
+                new Point(this.blockSizeX, this.blockSizeY))
+            .then((items: DrawObject[]) => {
+                items.forEach(item => {
                     this._animation.addDrawObject(item);
                 });
-        }).then(()=> {
-                this._drawObjectFactory.getCharacter(
-                    2,
+            });
+    }
+
+
+    private loadDrawObjects(id: number ): Promise<MoveObject>{
+
+        return this._drawObjectFactory.getCharacter(
+                    id,
                     this._canvas.context,
                     new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
                     new Point(this.blockSizeX, this.blockSizeY)
-                ).then((item: MoveObject)=> {
-                    this._objects.push(item);
-                    this._animation.addDrawObject(item);
-                    
-                    //update the step
-                    item.endStepSubject.subscribe((value)=> {
-                        
-                        //this._characterService.update(value, this.getBlockByCoordinate(item.getCoords()));
-                    });
-            });
-        });
+                );
+      }
+    
+    private handleInput(inputPoint: Point){
+
+        var character = this._characterService.Get(this.playerId);
+        if (character) {
+
+            let arrayPoints = this.getUIRouteCoordinatesFromUICoords(character.UIObject.getCoords(), inputPoint);
+            if (arrayPoints.length > 0){
+                character.UIObject.setMove(arrayPoints);
+            }  
+
+        }
     }
+
+    private getUIRouteCoordinatesFromUICoords (start: Point, end: Point): Point[]{
+
+        start = this.getBlockByCoordinate(start);
+        end = this.getBlockByCoordinate(end);
+
+        let arrayPoints: Point[] = [];
+        let routes = this._gridService.getRoute(start, end);
+
+        if (routes.length > 0){
+
+            arrayPoints.push(this.getCoordinateByBlock(start));
+            routes.forEach((element: Point) => {
+                arrayPoints.push(this.getCoordinateByBlock(element));
+            });
+        }
+
+        return arrayPoints;
+    }
+
 
     get blockSizeX(){
         return this._canvas.width / this._gridService.width;
