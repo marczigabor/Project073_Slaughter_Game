@@ -93,21 +93,21 @@ private characterSelctor(num: number): string{
   return path;
 }
 
-getCharacters(context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<DrawObject[]>{
+// getCharacters(context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<DrawObject[]>{
 
-  let promises: Promise<DrawObject>[] = [];
-  for (let i=0; i<2; i++){
-    promises.push(this.getCharacter(i, context, startCoord, blockSize));
-  }
+//   let promises: Promise<DrawObject>[] = [];
+//   for (let i=0; i<2; i++){
+//     promises.push(this.getCharacter(i, context, startCoord, blockSize));
+//   }
 
-  return new Promise<DrawObject[]>((resolve)=> {
-    Promise.all(promises).then((values)=>{
-      resolve(values);
-    });
-  }); 
-}
+//   return new Promise<DrawObject[]>((resolve)=> {
+//     Promise.all(promises).then((values)=>{
+//       resolve(values);
+//     });
+//   }); 
+// }
 
-getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point): Promise<MoveObject>{
+getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, blockSize: Point, speed: number): Promise<MoveObject>{
 
     return new Promise((resolve)=> {
 
@@ -118,7 +118,6 @@ getCharacter(num: number, context: CanvasRenderingContext2D, startCoord: Point, 
 
         let displaySize = new Point(originalSize.x * multiplier, originalSize.y * multiplier);
 
-        const speed = 3; // (Math.random() * 3) + 1;
         const options: DrawObjectOptions = {
             context: context,
             frameHeight: 48,

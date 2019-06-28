@@ -12,26 +12,17 @@ export class CharacterService {
     this.characters = [];
   }
 
-  Add(item: MoveObject) {
-
+  add(item: MoveObject) {
      //if (!this.characters.find((i :GameObject) => i.Id == item.id)){
       this.characters.push( new GameObject(item));
      //}
   }
 
-
-  Get (id: number): GameObject{
+  get (id: number): GameObject{
     return this.characters.find((i :GameObject) => i.Id == id);
   }
 
-  GetAll(id: number): GameObject[] {
+  getAll(id: number): GameObject[] {
     return this.characters.filter((i :GameObject) => i.Id == id);    
   }
-  //   this.characterArray = new Array(heightBlockNumber);
-
-  //   for (var i = 0; i < this.characterArray.length; i++) {
-  //     this.characterArray[i] = new Array(widthBlockNumber);
-  //   }    
-  // }
-
 }

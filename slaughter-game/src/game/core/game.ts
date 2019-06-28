@@ -10,12 +10,16 @@ import { GridService } from '../service/grid.service';
 import { MoveObject } from '../animation/moveObject';
 import { DrawObject } from '../animation/drawObject';
 import { CharacterService } from '../service/character.service';
+import { throttleTime } from 'rxjs/operators';
 
 export class Game {
 
 
     private playerId = 1;
+    private playerSpeed = 3;
+
     private enemyId = 2;
+    private enemySpeed = 2;
 
     private _canvas: Canvas;
     private _gridService: GridService;
@@ -41,31 +45,27 @@ export class Game {
             this._inputHandler.init().subscribe((event: MouseEvent) => this.handleInput(new Point(event.layerX, event.layerY)));
 
             this.loadField()
-            .then(()=>{
-                return this.loadDrawObjects(this.playerId).then((item)=>{
+            .then(async ()=>{
+                const item = await this.loadDrawObjects(this.playerId, this.playerSpeed);
 
-                    item.endStepSubject.subscribe((id: number)=>{
-                        //todo add this step to enemys
-
-                        //player choords
-                        let toUIPoint = item.getCoords();
-
-                        //get all enemies
-                        this._characterService.GetAll(this.enemyId).forEach((enemy)=>{
-
-                            //set new move points
-                            //move where the player is
-                            let arrayPoints = this.getUIRouteCoordinatesFromUICoords(enemy.UIObject.getCoords(), toUIPoint);
-                            if (arrayPoints.length > 0){
-                                enemy.UIObject.setMove(arrayPoints);
-                            }  
-            
-                        });
-
+                item.endStepSubject.pipe(
+                    throttleTime(200)
+                  ).subscribe((id: number) => {
+                    // todo add this step to enemys
+                    // player choords
+                    let toUIPoint = item.getCoords();
+                    // get all enemies
+                    this._characterService.getAll(this.enemyId).forEach((enemy) => {
+                        // set new move points
+                        // move where the player is
+                        let arrayPoints = this.getUIRouteCoordinatesFromUICoords(enemy.UIObject.getCoords(), toUIPoint);
+                        if (arrayPoints.length > 0) {
+                            enemy.UIObject.setMove(arrayPoints);
+                        }
                     });
-                    this._characterService.Add(item);
-                    this._animation.addDrawObject(item);
                 });
+                this._characterService.add(item);
+                this._animation.addDrawObject(item);
             }).then((i)=>{
                 return this._animation.init();
             });
@@ -78,8 +78,8 @@ export class Game {
 
     private loadEnemy(id: number, timeOut: number, maxNum: number, current: number){
         setTimeout(() => {
-            this.loadDrawObjects(2).then((item)=>{
-                this._characterService.Add(item);
+            this.loadDrawObjects(this.enemyId, this.enemySpeed).then((item)=>{
+                this._characterService.add(item);
                 this._animation.addDrawObject(item);
 
                 //load next until we reach the max number
@@ -90,40 +90,35 @@ export class Game {
         }, timeOut);
     }
 
-    private loadField(): Promise<void>{
+    private async loadField(): Promise<void>{
 
-        return this._drawObjectFactory.getFields(
-                this._gridService, 
-                this._canvas.contextBackground, 
-                new Point(this.blockSizeX, this.blockSizeY))
-            .then((items: DrawObject[]) => {
-                items.forEach(item => {
-                    this._animation.addDrawObject(item);
-                });
-            });
+        const items = await this._drawObjectFactory.getFields(this._gridService, this._canvas.contextBackground, new Point(this.blockSizeX, this.blockSizeY));
+        items.forEach(item => {
+        //     this._animation.addDrawObject(item);
+        });
     }
 
 
-    private loadDrawObjects(id: number ): Promise<MoveObject>{
+    private loadDrawObjects(id: number, speed: number ): Promise<MoveObject>{
 
         return this._drawObjectFactory.getCharacter(
                     id,
                     this._canvas.context,
                     new Point((Math.random() * this._canvas.width) + 1, (Math.random() * this._canvas.height) + 1),
-                    new Point(this.blockSizeX, this.blockSizeY)
+                    new Point(this.blockSizeX, this.blockSizeY),
+                    speed
                 );
-      }
+    }
     
     private handleInput(inputPoint: Point){
 
-        var character = this._characterService.Get(this.playerId);
+        var character = this._characterService.get(this.playerId);
         if (character) {
 
             let arrayPoints = this.getUIRouteCoordinatesFromUICoords(character.UIObject.getCoords(), inputPoint);
             if (arrayPoints.length > 0){
                 character.UIObject.setMove(arrayPoints);
             }  
-
         }
     }
 
@@ -137,7 +132,8 @@ export class Game {
 
         if (routes.length > 0){
 
-            arrayPoints.push(this.getCoordinateByBlock(start));
+            //TODO add if player turn is staggered
+            //arrayPoints.push(this.getCoordinateByBlock(start));
             routes.forEach((element: Point) => {
                 arrayPoints.push(this.getCoordinateByBlock(element));
             });
